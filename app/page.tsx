@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChatComponent } from "@/components/biz/chat";
+import { Chat } from "@/components/biz/chat";
 import { Sparkles, Code, Zap, Shield } from "lucide-react";
 import { Suspense } from "react";
 import { Skeleton } from '@/components/ui/skeleton'
@@ -157,7 +157,7 @@ export default function Home() {
             </p>
           </div>
           <Suspense fallback={<Skeleton />}>
-            <ChatComponent />
+            <Chat />
           </Suspense>
         </div>
       </section>

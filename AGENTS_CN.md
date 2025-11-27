@@ -63,6 +63,7 @@
     - hooks/ 目录存放组件内部的状态管理 Hooks
     - types/ 定义组件相关的类型
     - 通过 index.tsx 作为主入口，index.ts 统一导出保持清晰的 API
+    - 组件文件名使用 `PascalCase` (e.g., `UserProfile.tsx`).
 
 - **Base Component Layer (基础组件层，位于 /components/ui)**
 

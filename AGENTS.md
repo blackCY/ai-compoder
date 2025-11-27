@@ -63,6 +63,7 @@ The project is divided into Frontend and Backend, strictly adhering to the follo
     - hooks/ directory stores internal state management Hooks for the component
     - types/ defines component-related types
     - Use index.tsx as the main entry point, with index.ts for unified exports to maintain clear API
+    - Component filenames: `PascalCase` (e.g., `UserProfile.tsx`).
 
 - **Base Component Layer (Located in /components/ui)**
 
