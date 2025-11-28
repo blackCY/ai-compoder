@@ -22,12 +22,17 @@ export function CodeDisplay({ code, isGenerating }: CodeDisplayProps) {
   useEffect(() => {
     if (isGenerating) {
       setAutoScroll(true);
-    } else {
+    }
+  }, [isGenerating]);
+
+  // 生成完成后停止自动滚动
+  useEffect(() => {
+    if (!isGenerating && autoScroll) {
       // 生成完成后稍等一下再停止自动滚动
       const timer = setTimeout(() => setAutoScroll(false), 1000);
       return () => clearTimeout(timer);
     }
-  }, [isGenerating]);
+  }, [isGenerating, autoScroll]);
 
   if (!code && !isGenerating) {
     return null;

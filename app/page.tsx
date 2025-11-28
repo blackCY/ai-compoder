@@ -1,8 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Chat } from "@/components/biz/chat";
+import { ChatInterface } from "@/components/biz/ChatInterface";
 import { Sparkles, Code, Zap, Shield } from "lucide-react";
 import { Suspense } from "react";
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Home() {
   return (
@@ -10,8 +10,14 @@ export default function Home() {
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
         <div className="absolute top-20 left-10 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute bottom-20 left-1/3 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+        <div
+          className="absolute top-40 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "2s" }}
+        ></div>
+        <div
+          className="absolute bottom-20 left-1/3 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "4s" }}
+        ></div>
       </div>
 
       {/* Navigation */}
@@ -54,15 +60,22 @@ export default function Home() {
               <Sparkles className="w-4 h-4 mr-2" />
               AI 驱动的智能代码生成
             </div>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-white mb-8 leading-tight animate-fade-in-scale opacity-0" style={{ animationDelay: "0.2s" }}>
+            <h1
+              className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-white mb-8 leading-tight animate-fade-in-scale opacity-0"
+              style={{ animationDelay: "0.2s" }}
+            >
               让 AI
               <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                {" "}加速{" "}
+                {" "}
+                加速{" "}
               </span>
               <br />
               你的开发
             </h1>
-            <p className="text-xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in-scale opacity-0" style={{ animationDelay: "0.4s" }}>
+            <p
+              className="text-xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in-scale opacity-0"
+              style={{ animationDelay: "0.4s" }}
+            >
               基于 AI 的智能代码生成平台，严格使用内部组件库，快速构建高质量的业务页面。
               <br className="hidden sm:block" />
               体验流式代码生成，享受类型安全的开发环境。
@@ -90,7 +103,9 @@ export default function Home() {
                 <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-emerald-500/30 transform-optimized">
                   <Code className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-lg text-white group-hover:text-emerald-400 transition-colors duration-300">智能代码生成</CardTitle>
+                <CardTitle className="text-lg text-white group-hover:text-emerald-400 transition-colors duration-300">
+                  智能代码生成
+                </CardTitle>
               </CardHeader>
               <CardContent className="relative z-10">
                 <CardDescription className="text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
@@ -105,7 +120,9 @@ export default function Home() {
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-blue-500/30 transform-optimized">
                   <Shield className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-lg text-white group-hover:text-blue-400 transition-colors duration-300">组件库复用</CardTitle>
+                <CardTitle className="text-lg text-white group-hover:text-blue-400 transition-colors duration-300">
+                  组件库复用
+                </CardTitle>
               </CardHeader>
               <CardContent className="relative z-10">
                 <CardDescription className="text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
@@ -120,7 +137,9 @@ export default function Home() {
                 <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-teal-500/30 transform-optimized">
                   <Zap className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-lg text-white group-hover:text-teal-400 transition-colors duration-300">流式输出</CardTitle>
+                <CardTitle className="text-lg text-white group-hover:text-teal-400 transition-colors duration-300">
+                  流式输出
+                </CardTitle>
               </CardHeader>
               <CardContent className="relative z-10">
                 <CardDescription className="text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
@@ -135,7 +154,9 @@ export default function Home() {
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-purple-500/30 transform-optimized">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-lg text-white group-hover:text-purple-400 transition-colors duration-300">类型安全</CardTitle>
+                <CardTitle className="text-lg text-white group-hover:text-purple-400 transition-colors duration-300">
+                  类型安全
+                </CardTitle>
               </CardHeader>
               <CardContent className="relative z-10">
                 <CardDescription className="text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
@@ -151,13 +172,22 @@ export default function Home() {
       <section id="chat" className="py-24 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4 animate-fade-in-scale opacity-0" style={{ animationDelay: "0.6s" }}>开始体验</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto animate-fade-in-scale opacity-0" style={{ animationDelay: "0.8s" }}>
+            <h2
+              className="text-3xl font-bold text-white mb-4 animate-fade-in-scale opacity-0"
+              style={{ animationDelay: "0.6s" }}
+            >
+              开始体验
+            </h2>
+            <p
+              className="text-gray-400 max-w-2xl mx-auto animate-fade-in-scale opacity-0"
+              style={{ animationDelay: "0.8s" }}
+            >
               在下方描述您的需求，让 AI 为您生成专业的代码解决方案
             </p>
           </div>
+
           <Suspense fallback={<Skeleton />}>
-            <Chat />
+            <ChatInterface />
           </Suspense>
         </div>
       </section>

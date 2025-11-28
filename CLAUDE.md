@@ -1,115 +1,193 @@
-# Project Context
+# CLAUDE.md
 
-## 1. Project Overview
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-This project is an **AI-assisted code generation and business development platform**.
-The core objective is to leverage AI to understand business requirements and strictly utilize the **internal private component library** to rapidly build high-quality business pages.
+## Project Overview
 
-- **Core Principle:** Prioritize reusing existing UI components. Receive and render AI-generated code via streaming data.
+**AI Compoder** is an AI-assisted code generation and business development platform built with Next.js 16+. The platform leverages AI to understand business requirements and uses an internal private component library to rapidly build high-quality business pages with real-time streaming code generation.
 
-## 2. Architecture & Layers
+## Development Commands
 
-The project is divided into Frontend and Backend, strictly adhering to the following layering logic:
+```bash
+# Development server
+pnpm dev
 
-### Frontend Architecture
+# Production build
+pnpm build
 
-- **Page Layer (Located in /app)**
+# Start production server
+pnpm start
 
-  - **Responsibility:** Handles overall page layout and assembly.
-  - **Interaction Rules:**
-    1. Calls the **Server-Store Layer** to fetch or process backend data.
-    2. Assembles **Business Components** and **Base Components** for display.
-    3. **DOES NOT** make direct API calls.
+# ESLint checking
+pnpm lint
+```
 
-- **Server-Store Layer (Located in /lib/server-store)**
+## Architecture & Layering
 
-  - **Responsibility:** Acts as the data interaction hub.
-  - **Core Tech:** `@tanstack/react-query`.
-  - **Interaction Rules:**
-    1. Calls the **API Service Layer** (NOT backend API endpoints directly).
-    2. Handles data wrapping, caching, and Loading/Error states.
-    3. Exposes clean data hooks to the **Page Layer**.
-  - **Structure Specifications:**
-    - All functionality must be encapsulated as individual hooks calling tanstack/react-query
-    - Organize by business modules in directories (e.g., auth/, chat/, user/)
-    - Use `use` + business domain + specific functionality naming format
-    - Each hook has single responsibility, handling one specific data fetching/operation logic
-    - Unified error handling and retry mechanisms with clear TypeScript type definitions
+This project follows a **strict 4-layer architecture** with enforced dependency rules:
 
-- **API Service Layer (Located in /lib/services or /lib/api)**
+### 1. Page Layer (`/app`)
+- **Location**: `/app` directory with Next.js App Router
+- **Responsibility**: Overall page layout and component assembly
+- **Key Files**: `app/page.tsx` (landing page with hero, features, and chat), `app/layout.tsx` (root layout), `app/api/generate/route.ts` (AI generation API endpoint)
+- **Interaction Rules**: Calls Server-Store Layer only, NEVER calls API Service Layer or backend APIs directly
 
-  - **Responsibility:** Pure API calling functions using the request instance.
-  - **Interaction Rules:**
-    1. Uses the `request` instance (from `/lib/request`) to call backend API endpoints.
-    2. Defines typed API functions (e.g., `fetchChatHistory()`, `postMessage()`).
-    3. **NO business logic, state management, or caching** - just pure data fetching/posting.
-    4. Called ONLY by the **Server-Store Layer**, never directly by Page or Component layers.
-    5. Returns raw API responses with proper TypeScript types.
-  - **Structure Specifications:**
-    - APIs of the same business type are encapsulated in the same file (e.g., auth.ts, chat.ts, user.ts)
-    - Type definitions are uniformly placed in services/types/ directory, sharing the same name as the corresponding API service file
-    - Use clear verb + noun format for function naming, such as fetchUserProfile, createChatMessage
-    - Follow pure function principles, without business logic, only responsible for API calls and data transformation
+### 2. Server-Store Layer (`/lib/server-store`)
+- **Purpose**: Data interaction hub using TanStack Query for caching, loading/error states, and retry mechanisms
+- **Key Files**: `lib/server-store/providers/QueryProvider.tsx` (React Query provider), `lib/server-store/index.ts` (main entry)
+- **Tech Stack**: `@tanstack/react-query`
+- **Interaction Rules**: Calls API Service Layer only, handles data wrapping and caching
 
-- **Business Component Layer (Located in /components/biz)**
+### 3. API Service Layer (`/lib/services`)
+- **Purpose**: Pure API calling functions using the request instance
+- **Key Files**: `lib/request/index.ts` (comprehensive HTTP request utility)
+- **Interaction Rules**: Uses request instance to call backend APIs, contains NO business logic, state management, or caching
+- **Type Organization**: API types in `services/types/`, shared with corresponding service files
 
-  - **Responsibility:** Encapsulates **highly reusable** business modules (e.g., Header, Menu, UserProfile).
-  - **Critical Constraint:** **Avoid over-abstraction.** Only encapsulate logic that is truly reused across multiple pages. One-off business logic should remain in the Page Layer.
-  - **Structure Specifications:**
-    - Each business component is an independent module structure similar to src
-    - Contains its own components/, utils/, hooks/, types/ and other directory structures
-    - components/ directory stores internal sub-components
-    - utils/ directory stores component-specific utility functions
-    - hooks/ directory stores internal state management Hooks for the component
-    - types/ defines component-related types
-    - Use index.tsx as the main entry point, with index.ts for unified exports to maintain clear API
-    - Component filenames: `PascalCase` (e.g., `UserProfile.tsx`).
+### 4. Component Layers
+- **Business Components** (`/components/biz`): Reusable business modules (chat interface, AI generation)
+- **Base Components** (`/components/ui`): Atomic UI components from Shadcn/ui
 
-- **Base Component Layer (Located in /components/ui)**
+## Strict Dependency Rules
 
-  - **Responsibility:** Provides atomic, reusable UI components (Button, Input, Modal, etc.).
-  - **Interaction Rules:** The AI **MUST** prioritize using components from this layer when generating code. Do not use raw HTML unless absolutely necessary.
+**✅ Allowed Dependencies:**
+- Page Layer → Server-Store Layer → API Service Layer → Backend API Endpoints
+- Page Layer → Business Component Layer → Base Component Layer
+- Business Component Layer → Base Component Layer
+- API Service Layer → Backend API Endpoints (via request instance)
 
-#### Allowed dependencies (must be adhered to)
+**❌ Forbidden Dependencies:**
+- Page Layer → API Service Layer (must go through Server-Store Layer)
+- Page Layer → Backend API Endpoints (must go through Server-Store Layer)
+- Server-Store Layer → Backend API Endpoints (must go through API Service Layer)
+- Business Component Layer → API Service Layer (must go through Server-Store Layer)
+- Base Component Layer → Business Component Layer
 
-Page Layer → Server-Store Layer → API Service Layer → Backend API Endpoints
-Page Layer → Business Component Layer → Base Component Layer
-Business Component Layer → Base Component Layer
-API Service Layer → Backend API Endpoints (via request instance)
+## Tech Stack
 
-#### Forbidden dependencies (must be adhered to)
+### Core Framework
+- **Next.js 16+** with App Router
+- **React 19.2.0** with TypeScript
+- **Tailwind CSS v4** for styling
+- **Node.js** backend with API routes
 
-❌ Page Layer → API Service Layer (must go through Server-Store Layer)
-❌ Page Layer → Backend API Endpoints (must go through Server-Store Layer)
-❌ Server-Store Layer → Backend API Endpoints (must go through API Service Layer)
-❌ Business Component Layer → API Service Layer (must go through Server-Store Layer)
-❌ Base Component Layer → Business Component Layer
-❌ UI Layer reverse dependency data layer
+### AI Integration
+- **@ai-sdk/react** (v2.0.101) for AI integration
+- **@ai-sdk/openai-compatible** for flexible AI provider support
+- **Streaming code generation** with real-time display
 
-### Backend Architecture
+### UI Components
+- **Shadcn/ui** component system with "new-york" style
+- **Radix UI** primitives (avatar, scroll-area, slot)
+- **Class Variance Authority (CVA)** for component variants
+- **Framer Motion** (v12.23.24) for animations
+- **Lucide React** for icons
 
-- **Backend API Endpoints (Located in /app/api)**
-  - **Responsibility:** Backend API routes that handle requests from the frontend.
-  - **Note:** These are called by the frontend **API Service Layer**, not directly by frontend components or pages.
+### Development Tools
+- **ESLint** with Next.js configuration
+- **TypeScript** strict mode
+- **Geist fonts** (sans and mono)
+- **PostCSS** with Tailwind v4
 
-## 3. Tech Stack
+## Key Features
 
-- **Framework:** Next.js 16+ (App Router)
-- **Styling:** Tailwind CSS (Utility-first)
-- **State/Data:** TanStack Query (React Query)
-- **Language:** TypeScript
+### AI Code Generation Interface
+- **Real-time streaming** code generation with live display
+- **Interactive chat interface** with example prompts
+- **Code highlighting** and display with matrix background effects
+- **Keyboard shortcuts** (Ctrl+Enter) for quick generation
+- **Location**: `/components/biz/chat/` directory
 
-## 4. Global Code Style
+### Advanced UI/UX
+- **Glass morphism** effects with backdrop filters
+- **Premium animations** using Framer Motion and custom CSS
+- **Dark theme** with emerald/blue accent colors
+- **Responsive design** with mobile optimization
+- **Custom scrollbar** styling
+- **Loading states** with skeleton components
 
-- **Component Pattern:**
-  - Strictly use **Function Components** and **Hooks**.
-  - Prefer **Composition over Inheritance**.
-- **Naming Conventions:**
-  - Component filenames: `PascalCase` (e.g., `UserProfile.tsx`).
-  - Hook filenames: `camelCase` prefixed with `use` (e.g., `useUserData.ts`).
-- **Type Safety:**
-  - Use of `any` is **strictly prohibited**.
-  - Explicit TypeScript Interfaces/Types must be defined for all API responses.
-- **Tailwind CSS Specification:**
-  - Writing independent .css files is prohibited
-  - Can be abstracted into variants utility functions, but keep them as concise as possible
+### Component System
+- **CVA-powered** component variants
+- **Radix UI** primitives for accessibility
+- **Shadcn/ui** configuration with magicui registry
+- **Type-safe** component props with TypeScript
+
+## Code Standards
+
+### Naming Conventions
+- **Components**: `PascalCase` (e.g., `UserProfile.tsx`)
+- **Hooks**: `camelCase` with `use` prefix (e.g., `useUserData.ts`)
+- **Files**: Descriptive names with clear purpose
+- **Server Store**: `use` + business domain + functionality (e.g., `useChatHistory`, `useUserProfile`)
+
+### Architectural Rules
+- **Strict layering**: Follow the 4-layer architecture exactly
+- **Component composition**: Prefer composition over inheritance
+- **Type safety**: No `any` types, explicit interfaces for all API responses
+- **Suspense boundaries**: All async client components wrapped in Suspense with skeleton fallback
+
+### Performance Optimizations
+- `will-change` for animations
+- Optimized re-renders with proper dependency arrays
+- Suspense boundaries with skeleton fallbacks
+- Reduced motion support for accessibility
+
+## Project Structure
+
+```
+/Users/fengye/Desktop/Wind/test/AI/ai-compoder/
+├── app/                          # Next.js App Router pages
+│   ├── api/generate/             # AI generation API endpoint
+│   ├── page.tsx                  # Landing page
+│   ├── layout.tsx                # Root layout with providers
+│   └── globals.css               # Global styles with Tailwind v4
+├── components/
+│   ├── biz/                      # Business components
+│   │   └── chat/                 # AI chat interface with streaming
+│   └── ui/                       # Base UI components (Shadcn/ui)
+├── lib/
+│   ├── server-store/             # TanStack Query data layer
+│   ├── request/                  # HTTP request utilities
+│   ├── services/                 # API service functions
+│   └── utils.ts                  # Utility functions (cn helper)
+├── docs/                         # Project documentation
+└── public/                       # Static assets
+```
+
+## Environment Configuration
+
+Required environment variables:
+- `OPENAI_API_KEY`: OpenAI API key or compatible provider
+- `OPENAI_BASE_URL`: Base URL for OpenAI-compatible API (optional)
+- `AI_PROVIDER`: AI provider name (e.g., 'openai', 'anthropic')
+- `AI_MODEL`: Model name for AI generation
+
+## Development Guidelines
+
+### When Working with AI Generation
+- Always use the existing AI chat interface in `components/biz/chat/`
+- Follow the streaming pattern for real-time code display
+- Integrate with the existing API endpoint structure
+- Use the matrix background and glass morphism effects for consistency
+
+### Component Development
+- Prioritize using existing base components from `components/ui/`
+- Business components should be highly reusable across pages
+- Avoid over-abstraction - keep one-off logic in Page Layer
+
+### API Integration
+- All API calls must go through the Server-Store Layer
+- API Service Layer functions are pure and typed
+- Request instance in `lib/request/` handles timeout, errors, and interceptors
+- Server-Store uses TanStack Query for caching and state management
+
+### Styling Guidelines
+- Use Tailwind CSS v4 utility classes
+- No separate CSS files allowed
+- Can abstract into variants utility functions but keep them concise
+- Maintain the dark theme with emerald/blue accents
+- Use glass morphism effects and backdrop filters for premium feel
+
+## Package Manager
+
+This project uses **pnpm** as the package manager. Always use `pnpm` commands for dependency management.
