@@ -7,11 +7,6 @@ export interface ChatInterfaceProps {
   children?: ReactNode;
 }
 
-export interface ChatInterfaceRef {
-  focus: () => void;
-  clear: () => void;
-}
-
 export interface CodeDisplayProps {
   code: string;
   isGenerating: boolean;

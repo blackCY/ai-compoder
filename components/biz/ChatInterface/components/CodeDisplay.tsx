@@ -1,13 +1,16 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { MatrixBackground } from "./MatrixBackground";
 import { useEffect, useRef, useState } from "react";
+import { useStage } from "@/lib/store/pipeline";
 
-interface CodeDisplayProps {
-  code: string;
-  isGenerating: boolean;
-}
+interface CodeDisplayProps {}
 
-export function CodeDisplay({ code, isGenerating }: CodeDisplayProps) {
+export function CodeDisplay(props: CodeDisplayProps) {
+  const { snapshot, status, final } = useStage('stage-1');
+  const isGenerating = status === 'running';
+
+  const code = final || snapshot;
+
   const [autoScroll, setAutoScroll] = useState(false);
   const codeRef = useRef<HTMLDivElement>(null);
 
@@ -75,10 +78,10 @@ export function CodeDisplay({ code, isGenerating }: CodeDisplayProps) {
             </div>
           )}
 
-          {code && (
+          {!!code && (
             <div className="p-6">
               <code className="font-mono text-sm text-emerald-300 leading-relaxed block">
-                {code}
+                {/* {code} */}
               </code>
             </div>
           )}

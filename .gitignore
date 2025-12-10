@@ -40,6 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .vscode
-.mcp.json
 *storybook.log
 storybook-static
+
+.claude
+openspec
+drafts
+prd-docs

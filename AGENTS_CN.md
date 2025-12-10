@@ -48,7 +48,7 @@ pnpm lint
 - **业务组件** (`/components/biz`): 可复用的业务模块（聊天界面、AI 生成等）
 - **基础组件** (`/components/ui`): 来自 Shadcn/ui 的原子级 UI 组件
 
-## 严格的依赖规则
+### 严格的依赖规则
 
 **✅ 允许的依赖：**
 - 页面层 → Server-Store 层 → API Service 层 → 后端 API 端点

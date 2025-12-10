@@ -41,7 +41,7 @@ export class RequestError extends Error {
 
 // 默认配置
 const DEFAULT_CONFIG: Partial<RequestConfig> = {
-  timeout: 10000,
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -72,6 +72,7 @@ export async function request(
 
   // 创建 AbortController
   const controller = new AbortController();
+
   const timeoutId = setTimeout(() => {
     controller.abort();
   }, timeout);
