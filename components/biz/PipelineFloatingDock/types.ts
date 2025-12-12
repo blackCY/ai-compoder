@@ -1,4 +1,4 @@
-import { PipelineTypeId } from "@/lib/store/pipeline/types";
+import { PipelineTypeId, SchemaStageIds } from "@/lib/store/pipeline/types";
 
 export interface PipelineFloatingDockProps {
   pipelineId: PipelineTypeId;
@@ -8,6 +8,6 @@ export interface PipelineFloatingDockProps {
 
 export interface PipelineTerminalOutputProps {
   isVisible: boolean;
-  pipelineId: string;
-  stageId?: string;
+  pipelineId: PipelineTypeId;
+  stageId: SchemaStageIds<PipelineTypeId>;
 }

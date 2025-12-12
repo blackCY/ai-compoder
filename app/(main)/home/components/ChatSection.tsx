@@ -1,5 +1,3 @@
-"use client";
-
 import { PipelineFloatingDock } from "@/components/biz/PipelineFloatingDock";
 
 export const ChatSection = () => {

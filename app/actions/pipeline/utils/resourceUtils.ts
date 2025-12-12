@@ -26,7 +26,7 @@ function buildResourcePrompt(resources?: Resource): string {
 
   const resourceText = Object.entries(resources)
     .map(([name, config]) => {
-      return `## Component: ${name}\nDescription: ${config.description}\nAPI:\n${config.api}`;
+      return `## Component: ${name}\n###Description: ${config.description}\n###API:\n${config.api}`;
     })
     .join("\n\n");
 

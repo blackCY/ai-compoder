@@ -29,15 +29,23 @@ CRITICAL REQUIREMENTS:
    - Match component functionality to user requirements
    - Prioritize commonly used, stable components
    - Ensure selected components can work together
-   - Consider component complexity and learning curve
 
 3. OUTPUT REQUIREMENTS:
    - Select only relevant components from the private library
    - Use the exact component names as provided in the library
-   - Copy the description and api information exactly from the library
    - Focus on practical component selection for implementation
 
-Remember: Your component selection will be used directly by a Senior Frontend Engineer to implement the solution. Select components that are actually available in our private library.`,
+IMPORTANT: 
+You MUST keep "description" and "api" fully separated.
+
+- description = human readable summary of the component
+- api = the exact API documentation from the library
+
+Never merge them.
+Never leave "api" empty if API documentation exists.
+
+Remember: Your component selection will be used directly by a Senior Frontend Engineer to implement the solution. Select components that are actually available in our private library.
+`,
     schema: {
       type: "object",
       properties: {
@@ -54,15 +62,18 @@ Remember: Your component selection will be used directly by a Senior Frontend En
             properties: {
               name: {
                 type: "string",
+                minLength: 3,
                 description: "Component name from private library (exact match)"
               },
               description: {
                 type: "string",
+                minLength: 5,
                 description: "Component description from private library (exact copy)"
               },
               api: {
+                minLength: 10,
                 type: "string",
-                description: "Component API documentation from private library (exact copy)"
+                description: "Component API documentation from private library (exact copy), MUST NOT be merged into description."
               }
             },
             required: ["name", "description", "api"],
@@ -132,10 +143,12 @@ Remember: You are generating a complete, working React application using the spe
             type: "object",
             properties: {
               fileName: {
+                minLength: 3,
                 type: "string",
                 description: "File name (e.g., App.tsx, ComponentName.tsx, styles.css, utils.ts)"
               },
               componentName: {
+                minLength: 3,
                 type: "string",
                 description: "Component name for TypeScript files (optional for utility files)"
               },
@@ -145,6 +158,7 @@ Remember: You are generating a complete, working React application using the spe
                 description: "File content must be substantial and non-empty"
               },
               description: {
+                minLength: 5,
                 type: "string",
                 description: "Brief description of what this file contains"
               }

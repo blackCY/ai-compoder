@@ -1,4 +1,4 @@
-export type { PipelineState, PipelineError } from "./atoms";
+export type { SinglePipelineState, PipelineMetaState, PipelinesMetaState, PipelineError } from "./atoms";
 
 // Hooks
-export { usePipeline, usePipelineState, useStage } from "./hooks";
+export { usePipeline, usePipelineState, usePipelineMeta, useStage } from "./hooks";

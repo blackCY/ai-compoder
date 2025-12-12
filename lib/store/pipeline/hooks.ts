@@ -4,13 +4,13 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { selectAtom } from "jotai/utils";
 import { useMemo } from "react";
 import {
-  pipelineAtom,
+  pipelinesMetaAtom,
   stagesAtom,
   defaultStageState,
   updatePipelineAtom,
   updateStageAtom,
-  resetAllAtom,
-  PipelineState,
+  resetPipelineAtom,
+  SinglePipelineState,
 } from "./atoms";
 import { consumeSSE } from "./sse";
 import { StageState } from "./types";
@@ -25,30 +25,77 @@ import {
 // ============================================
 
 /**
- * usePipelineState - 获取 Pipeline 全局状态
- * 包含 isRunning 和 error 信息
+ * usePipelineState - 获取指定 Pipeline 的完整状态
+ * 包含 isRunning、error、stages 等信息
+ * 注意：stages 是动态组合的，如果只需要元数据，考虑使用 usePipelineMeta
+ * 
+ * @param typeId - Pipeline 类型 ID
  */
-export function usePipelineState(): PipelineState {
-  return useAtomValue(pipelineAtom);
+export function usePipelineState<T extends PipelineTypeId>(
+  typeId: T
+): SinglePipelineState<T> {
+  const metaAtom = useMemo(
+    () => selectAtom(pipelinesMetaAtom, (pipelines) => pipelines[typeId]),
+    [typeId]
+  );
+  const meta = useAtomValue(metaAtom);
+  
+  // 获取该 pipeline 的所有 stages
+  const stagesMapAtom = useMemo(
+    () => selectAtom(stagesAtom, (allStages) => {
+      const prefix = `${typeId}:`;
+      const pipelineStages: Record<string, StageState> = {};
+      Object.entries(allStages).forEach(([key, value]) => {
+        if (key.startsWith(prefix)) {
+          const stageId = key.slice(prefix.length);
+          pipelineStages[stageId] = value;
+        }
+      });
+      return pipelineStages;
+    }),
+    [typeId]
+  );
+  const stages = useAtomValue(stagesMapAtom);
+  
+  return {
+    ...meta,
+    stages,
+  } as SinglePipelineState<T>;
 }
 
 /**
- * usePipeline - 管理 Pipeline 运行
+ * usePipelineMeta - 仅获取 Pipeline 的元数据（不包含 stages）
+ * 性能更好，适合只需要 isRunning、error 等信息的场景
+ * 
+ * @param typeId - Pipeline 类型 ID
+ */
+export function usePipelineMeta<T extends PipelineTypeId>(typeId: T) {
+  const metaAtom = useMemo(
+    () => selectAtom(pipelinesMetaAtom, (pipelines) => pipelines[typeId]),
+    [typeId]
+  );
+  return useAtomValue(metaAtom);
+}
+
+/**
+ * usePipeline - 管理指定类型 Pipeline 的运行
  * 每次 run() 调用都是一个全新的任务
  * 支持类型安全的 pipeline 类型推断
+ * 
+ * @param typeId - Pipeline 类型 ID
  */
-export function usePipeline() {
-  const pipelineState = usePipelineState();
+export function usePipeline<T extends PipelineTypeId>(typeId: T) {
+  const pipelineMeta = usePipelineMeta(typeId);
   const updatePipeline = useSetAtom(updatePipelineAtom);
   const updateStage = useSetAtom(updateStageAtom);
-  const resetAll = useSetAtom(resetAllAtom);
+  const resetPipeline = useSetAtom(resetPipelineAtom);
 
-  const run = async (input: string, typeId: PipelineTypeId) => {
-    if (pipelineState.isRunning) return;
+  const run = async (input: string) => {
+    if (pipelineMeta.isRunning) return;
 
     // 1. 构建消息上下文
     const messages: ModelMessage[] = [];
-    const { previousUserInput, finalOutput } = pipelineState;
+    const { previousUserInput, finalOutput } = pipelineMeta;
 
     // 如果有上一轮对话上下文，插入历史记录
     if (previousUserInput && finalOutput) {
@@ -61,36 +108,52 @@ export function usePipeline() {
     messages.push({ role: "user", content: input });
 
     // 2. 重置并更新状态
-    resetAll();
+    resetPipeline(typeId);
     updatePipeline({
-      isRunning: true,
-      finalOutput: null,
-      previousUserInput: input, // 保存当前输入作为下一次的"上一轮输入"
+      typeId,
+      patch: {
+        isRunning: true,
+        finalOutput: null,
+        previousUserInput: input, // 保存当前输入作为下一次的"上一轮输入"
+      },
     });
 
     try {
       await consumeSSE(
         { messages, typeId },
         update => {
-          updateStage(update);
+          updateStage({
+            typeId,
+            stageId: update.id,
+            patch: update.patch,
+          });
 
-          // 如果是错误事件，同步到 pipelineAtom
+          // 如果是错误事件，同步到 pipeline 状态
           if (update.patch.status === "error" && update.patch.error) {
             updatePipeline({
-              error: {
-                stageId: update.id,
-                message: update.patch.error,
+              typeId,
+              patch: {
+                error: {
+                  stageId: update.id,
+                  message: update.patch.error,
+                },
               },
             });
           }
         },
         finalOutput => {
           // 运行结束后保存最终输出，供下一次对话使用
-          updatePipeline({ finalOutput });
+          updatePipeline({
+            typeId,
+            patch: { finalOutput },
+          });
         }
       );
     } finally {
-      updatePipeline({ isRunning: false });
+      updatePipeline({
+        typeId,
+        patch: { isRunning: false },
+      });
     }
   };
 
@@ -109,15 +172,17 @@ function shallowEqual(a: StageState, b: StageState): boolean {
 }
 
 /**
- * useStage - 获取指定阶段的状态
- * 使用 selectAtom 优化：只在对应 stageId 的状态变化时才重渲染
+ * useStage - 获取指定 Pipeline 的指定 Stage 状态
+ * 使用独立的 stage key 存储，完全隔离不同 stage 的更新
  * 支持通过泛型进行类型安全的 schema 推断
+ * 
+ * @param typeId - Pipeline 类型 ID，用于定位具体的 pipeline
+ * @param stageId - Stage ID，必须是该 Pipeline 类型的有效 stage
  */
 export function useStage<
   T extends PipelineTypeId,
   S extends keyof PipelineRegistry[T]
 >(
-  // TODO 这里优化一下，这个 typeId 目前没有用到，说明全部 pipeline 都合到一起了，得区分开
   typeId: T,
   stageId: S
 ): {
@@ -128,8 +193,16 @@ export function useStage<
   error?: string;
 } {
   const stageAtom = useMemo(
-    () => selectAtom(stagesAtom, stages => stages[stageId as string] ?? defaultStageState, shallowEqual),
-    [stageId]
+    () =>
+      selectAtom(
+        stagesAtom,
+        (stages) => {
+          const key = `${typeId}:${stageId as string}` as keyof typeof stages;
+          return stages[key] ?? defaultStageState;
+        },
+        shallowEqual
+      ),
+    [typeId, stageId]
   );
 
   const stageState = useAtomValue(stageAtom);

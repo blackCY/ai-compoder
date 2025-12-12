@@ -5,11 +5,12 @@ import { Loader2 } from "lucide-react";
 import { useStage } from "@/lib/store/pipeline";
 import { StageOutputDisplay } from "./StageOutputDisplay";
 import { PipelineTerminalOutputProps } from "../types";
+import { PipelineRegistry } from "@/lib/store/pipeline/types";
 
 export const PipelineTerminalOutput: React.FC<PipelineTerminalOutputProps> = ({
   isVisible,
   pipelineId,
-  stageId = "stage-1",
+  stageId
 }) => {
   const stage = useStage(pipelineId, stageId);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -34,12 +35,18 @@ export const PipelineTerminalOutput: React.FC<PipelineTerminalOutputProps> = ({
           {stage.status === "running" && (
             <>
               <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400 mr-2" />
-              <span className="text-emerald-400 font-semibold text-xs">Analyzing Requirements...</span>
+              <span className="text-emerald-400 font-semibold text-xs">
+                Analyzing Requirements...
+              </span>
             </>
           )}
           {stage.status === "done" && (
             <>
-              <svg className="w-3.5 h-3.5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <svg
+                className="w-3.5 h-3.5 text-green-400 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path
                   fillRule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -51,7 +58,11 @@ export const PipelineTerminalOutput: React.FC<PipelineTerminalOutputProps> = ({
           )}
           {stage.status === "error" && (
             <>
-              <svg className="w-3.5 h-3.5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <svg
+                className="w-3.5 h-3.5 text-red-400 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path
                   fillRule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -61,7 +72,9 @@ export const PipelineTerminalOutput: React.FC<PipelineTerminalOutputProps> = ({
               <span className="text-red-400 font-semibold text-xs">Analysis Failed</span>
             </>
           )}
-          {stage.status === "idle" && <span className="text-gray-400 font-semibold text-xs">Ready</span>}
+          {stage.status === "idle" && (
+            <span className="text-gray-400 font-semibold text-xs">Ready</span>
+          )}
         </div>
 
         {/* Error Display */}
@@ -83,7 +96,12 @@ export const PipelineTerminalOutput: React.FC<PipelineTerminalOutputProps> = ({
 
         {/* Output Display - show snapshot while running, final when done */}
         {(stage.final || stage.snapshot) && (
-          <StageOutputDisplay output={stage.final || stage.snapshot} />
+          <StageOutputDisplay
+            output={
+              (stage.final ||
+                stage.snapshot) as PipelineRegistry["business-code-generate"]["stage-1"]
+            }
+          />
         )}
 
         {/* Idle State */}

@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { StageState } from "@/lib/store/pipeline/types";
+import { StageState, PipelineTypeId, PipelineRegistry } from "@/lib/store/pipeline/types";
 
 // ============================================
 // 类型定义
@@ -15,9 +15,9 @@ export interface PipelineError {
 }
 
 /**
- * Pipeline 全局状态
+ * 单个 Pipeline 的元数据状态（不包含 stages）
  */
-export interface PipelineState {
+export interface PipelineMetaState {
   isRunning: boolean;
   error?: {
     stageId?: string;
@@ -26,6 +26,33 @@ export interface PipelineState {
   finalOutput: any | null;
   previousUserInput: string | null;
 }
+
+/**
+ * 单个 Pipeline 的完整状态（包含 stages，用于对外暴露）
+ */
+export interface SinglePipelineState<T extends PipelineTypeId = PipelineTypeId> {
+  isRunning: boolean;
+  error?: {
+    stageId?: string;
+    message: string;
+  };
+  finalOutput: any | null;
+  previousUserInput: string | null;
+  stages: Record<string, StageState>; // 该 pipeline 的所有 stage 状态
+}
+
+/**
+ * 所有 Pipeline 的元数据状态集合
+ */
+export type PipelinesMetaState = {
+  [K in PipelineTypeId]: PipelineMetaState;
+};
+
+/**
+ * 所有 Stages 的状态 Map
+ * 使用 "typeId:stageId" 作为 key
+ */
+export type StagesState = Record<string, StageState>;
 
 // ============================================
 // Atoms
@@ -41,55 +68,105 @@ export const defaultStageState: StageState = {
 };
 
 /**
- * 默认 Pipeline 状态
+ * 默认 Pipeline 元数据状态
  */
-export const defaultPipelineState: PipelineState = {
+export const defaultPipelineMetaState: PipelineMetaState = {
   isRunning: false,
   finalOutput: null,
   previousUserInput: null,
 };
 
 /**
- * Pipeline 全局状态 Atom
- * 包含运行状态和错误信息
+ * 创建默认的 PipelinesMetaState
  */
-export const pipelineAtom = atom<PipelineState>(defaultPipelineState);
+function createDefaultPipelinesMetaState(): PipelinesMetaState {
+  const state = {} as PipelinesMetaState;
+  const pipelineTypes: PipelineTypeId[] = ["business-code-generate"];
+  
+  pipelineTypes.forEach((typeId) => {
+    state[typeId] = { ...defaultPipelineMetaState };
+  });
+  
+  return state;
+}
 
 /**
- * 所有阶段的状态 Map
+ * 所有 Pipeline 的元数据状态 Atom（不包含 stages）
  */
-export const stagesAtom = atom<Record<string, StageState>>({});
+export const pipelinesMetaAtom = atom<PipelinesMetaState>(createDefaultPipelinesMetaState());
+
+/**
+ * 所有 Stages 的状态 Atom
+ * 使用独立的 atom 存储，key 格式为 "typeId:stageId"
+ * 避免更新一个 stage 影响其他 stage 的订阅
+ */
+export const stagesAtom = atom<StagesState>({});
 
 // ============================================
 // Action Atoms
 // ============================================
 
 /**
- * 更新 Pipeline 状态
+ * 更新指定 Pipeline 的元数据状态
  */
-export const updatePipelineAtom = atom(null, (get, set, update: Partial<PipelineState>) => {
-  const current = get(pipelineAtom);
-  set(pipelineAtom, { ...current, ...update });
-});
-
-/**
- * 更新特定阶段状态
- */
-export const updateStageAtom = atom(
+export const updatePipelineAtom = atom(
   null,
-  (get, set, update: { id: string; patch: Partial<StageState> }) => {
-    const current = get(stagesAtom);
-    set(stagesAtom, {
+  (get, set, update: { typeId: PipelineTypeId; patch: Partial<PipelineMetaState> }) => {
+    const current = get(pipelinesMetaAtom);
+    const pipelineState = current[update.typeId];
+    set(pipelinesMetaAtom, {
       ...current,
-      [update.id]: { ...current[update.id], ...update.patch },
+      [update.typeId]: {
+        ...pipelineState,
+        ...update.patch,
+      },
     });
   }
 );
 
 /**
- * 重置所有状态（Pipeline + Stages）
+ * 更新指定 Pipeline 的特定 Stage 状态
+ * 使用独立的 key 存储，避免影响其他 stage
  */
-export const resetAllAtom = atom(null, (_get, set) => {
-  set(pipelineAtom, defaultPipelineState);
-  set(stagesAtom, {});
-});
+export const updateStageAtom = atom(
+  null,
+  (get, set, update: { typeId: PipelineTypeId; stageId: string; patch: Partial<StageState> }) => {
+    const current = get(stagesAtom);
+    const stageKey = `${update.typeId}:${update.stageId}`;
+    const currentStage = current[stageKey] || defaultStageState;
+    
+    set(stagesAtom, {
+      ...current,
+      [stageKey]: {
+        ...currentStage,
+        ...update.patch,
+      },
+    });
+  }
+);
+
+/**
+ * 重置指定 Pipeline 的所有状态（包括元数据和 stages）
+ */
+export const resetPipelineAtom = atom(
+  null,
+  (get, set, typeId: PipelineTypeId) => {
+    // 重置元数据
+    const currentMeta = get(pipelinesMetaAtom);
+    set(pipelinesMetaAtom, {
+      ...currentMeta,
+      [typeId]: { ...defaultPipelineMetaState },
+    });
+    
+    // 清除该 pipeline 的所有 stages
+    const currentStages = get(stagesAtom);
+    const newStages: StagesState = {};
+    const prefix = `${typeId}:`;
+    Object.entries(currentStages).forEach(([key, value]) => {
+      if (!key.startsWith(prefix)) {
+        newStages[key] = value;
+      }
+    });
+    set(stagesAtom, newStages);
+  }
+);

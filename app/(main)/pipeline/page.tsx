@@ -1,17 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePipeline, usePipelineState, useStage } from "@/lib/store/pipeline";
+import { usePipeline, usePipelineMeta, useStage } from "@/lib/store/pipeline";
 
 // ============================================
 // Stage 1: Design Phase Display
 // ============================================
 
 function Stage1Display() {
-  const { status, snapshot, final, error } = useStage(
-    "business-code-generate",
-    "stage-1"
-  );
+  const { status, snapshot, final, error } = useStage("business-code-generate", "stage-1");
   const data = final || snapshot;
 
   if (status === "idle" && !data) return null;
@@ -63,7 +60,7 @@ function Stage1Display() {
                     {comp.description}
                   </p>
                   <div className="rounded bg-gray-100 p-2 text-xs font-mono text-gray-500 dark:bg-gray-950 dark:text-gray-500">
-                    {/* {comp.api} */}
+                    {comp.api}
                   </div>
                 </div>
               ))}
@@ -87,10 +84,7 @@ function Stage1Display() {
 // ============================================
 
 function Stage2Display() {
-  const { status, snapshot, final, error } = useStage(
-    "business-code-generate",
-    "stage-2"
-  );
+  const { status, snapshot, final, error } = useStage("business-code-generate", "stage-2");
   const data = final || snapshot;
   const [activeTab, setActiveTab] = useState<string>("");
 
@@ -168,13 +162,13 @@ function Stage2Display() {
 
 function PipelineContent() {
   const [input, setInput] = useState("");
-  const { run } = usePipeline();
-  const { isRunning } = usePipelineState();
+  const { run } = usePipeline("business-code-generate");
+  const { isRunning } = usePipelineMeta("business-code-generate");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim()) {
-      run(input, "business-code-generate");
+      run(input);
     }
   };
 
