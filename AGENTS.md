@@ -41,9 +41,9 @@ pnpm start
 pnpm lint
 ```
 
-## Architecture & Layering
+## Front-end Architecture & Layering
 
-This project follows a **strict 4-layer architecture** with enforced dependency rules:
+This front-end part of this project follows a **strict 4-layer architecture** with enforced dependency rules:
 
 ### 1. Page Layer (`/app`)
 - **Location**: `/app` directory with Next.js App Router
@@ -133,6 +133,14 @@ This project follows a **strict 4-layer architecture** with enforced dependency 
 
 ## Code Standards
 
+### Directory-Specific Guidelines
+- **CRITICAL**: When working in any subdirectory that contains an `AGENTS.md` or `CLAUDE.md` file, you MUST read and strictly follow the specifications defined in that file
+- **Examples**: 
+  - `components/biz/CLAUDE.md` - Contains specific rules for business component development
+  - Other directories may have their own `AGENTS.md` files with domain-specific requirements
+- **Priority**: Directory-specific guidelines take precedence over general project guidelines when working within that directory
+- **Discovery**: Always check for `AGENTS.md` or `CLAUDE.md` files when entering a new directory structure
+
 ### Naming Conventions
 - **Components**: `PascalCase` (e.g., `UserProfile.tsx`)
 - **Hooks**: `camelCase` with `use` prefix (e.g., `useUserData.ts`)
@@ -151,27 +159,56 @@ This project follows a **strict 4-layer architecture** with enforced dependency 
 - Suspense boundaries with skeleton fallbacks
 - Reduced motion support for accessibility
 
-## Project Structure
+## Front-end Project Structure
 
 ```
 /Users/fengye/Desktop/Wind/test/AI/ai-compoder/
-├── app/                          # Next.js App Router pages
-│   ├── api/generate/             # AI generation API endpoint
-│   ├── page.tsx                  # Landing page
-│   ├── layout.tsx                # Root layout with providers
+├── app/                          # Next.js App Router
+│   ├── (main)/                   # Main route group - all page route files are defined here
+│   │   │                        # Route groups allow shared layouts without affecting URL paths
+│   │   ├── page.tsx             # Homepage (root path /)
+│   ├── api/                      # API routes - backend interface endpoints
+│   │   │                        # Supports HTTP methods like GET, POST, PUT, DELETE
+│   ├── actions/                  # Server Actions - server-side operation functions
+│   │   │                        # Server functions callable from client, supporting database operations
+│   ├── layout.tsx                # Root layout and providers - global app layout
+│   │   │                        # Contains global styles, fonts, theme providers, etc.
+│   ├── not-found.tsx            # 404 page - custom not found page
 │   └── globals.css               # Global styles with Tailwind v4
 ├── components/
-│   ├── biz/                      # Business components
-│   │   └── chat/                 # AI chat interface with streaming
+│   ├── biz/                      # Business components (reusable business modules)
 │   └── ui/                       # Base UI components (Shadcn/ui)
+│       │                        # Atomic UI components like buttons, inputs, cards, etc.
 ├── lib/
 │   ├── server-store/             # TanStack Query data layer
+│   │   │                        # Manages server data fetching, caching, state synchronization
+│   ├── store/                    # Client state management (like pipeline store)
+│   │   │                        # Uses Zustand or Context API for client state management
 │   ├── request/                  # HTTP request utilities
+│   │   │                        # Encapsulates fetch/axios, unified handling of headers, errors
 │   ├── services/                 # API service functions
-│   └── utils.ts                  # Utility functions (cn helper)
-├── docs/                         # Project documentation
+│   │   │                        # Pure functions encapsulating specific API call logic
+│   └── utils.ts                  # Common utility functions (cn helper function)
+│       │                        # Cross-component shared pure utility functions, like class name merging
 └── public/                       # Static assets
+    │                           # Images, fonts, icons and other static files
 ```
+
+### Page Route Resource Management Principles
+
+1. **Page-specific Resources**: Each page route directory's `components/`, `utils/`, `types/` are for that page only
+2. **Shared Resource Extraction**: When a component or utility function needs to be used by multiple pages, extract it to:
+   - `components/biz/` - Reusable business components
+   - `components/ui/` - Reusable base UI components
+   - `lib/utils.ts` - Reusable common utility functions
+3. **Naming Conventions**: Page-specific resources should use clear prefixes or namespaces to avoid conflicts with shared resources
+
+### Route Group Advantages
+
+Benefits of using `(main)` route group:
+- **Shared Layout**: Can provide unified layout for all pages in the group
+- **Code Organization**: Related pages can be organized together for easier management
+- **Clean URLs**: Does not affect actual URL paths (like `/editor` instead of `/main/editor`)
 
 ## Environment Configuration
 

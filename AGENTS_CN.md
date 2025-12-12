@@ -22,9 +22,9 @@ pnpm start
 pnpm lint
 ```
 
-## 架构与分层
+## 前端架构与分层
 
-本项目遵循**严格的 4 层架构**，具有强制依赖规则：
+本项目前端部分遵循**严格的 4 层架构**，具有强制依赖规则：
 
 ### 1. 页面层 (`/app`)
 - **位置**: `/app` 目录使用 Next.js App Router
@@ -114,6 +114,20 @@ pnpm lint
 
 ## 代码标准
 
+### 目录特定指南
+
+- **关键**：在包含 `AGENTS.md` 或 `CLAUDE.md` 文件的任何子目录中工作，你必须阅读并严格遵循该文件中定义的规范
+
+- **示例**：
+
+- `components/biz/CLAUDE.md` - 包含业务组件开发的特定规则
+
+- 其他目录可能有自己的 `AGENTS.md` 文件，包含特定领域的需求
+
+- **优先级**：在特定目录内工作时，目录特定指南优先于一般项目指南
+
+- **发现**：进入新的目录结构时，始终检查 `AGENTS.md` 或 `CLAUDE.md` 文件
+
 ### 命名约定
 - **组件**: `PascalCase` (e.g., `UserProfile.tsx`)
 - **Hooks**: `camelCase` 带 `use` 前缀 (e.g., `useUserData.ts`)
@@ -132,27 +146,56 @@ pnpm lint
 - Suspense 边界带骨架屏 fallback
 - 支持可访问性的减少动画
 
-## 项目结构
+## 前端部分项目结构
 
 ```
 /Users/fengye/Desktop/Wind/test/AI/ai-compoder/
-├── app/                          # Next.js App Router 页面
-│   ├── api/generate/             # AI 生成 API 端点
-│   ├── page.tsx                  # 落地页
-│   ├── layout.tsx                # 根布局和提供者
+├── app/                          # Next.js App Router
+│   ├── (main)/                   # 主要路由组 - 所有页面路由文件都定义在这里
+│   │   │                        # 使用路由组可以共享布局而不影响 URL 路径
+│   │   ├── page.tsx             # 首页页面 (根路径 /)
+│   ├── api/                      # API 路由 - 后端接口端点
+│   │   │                        # 支持 GET、POST、PUT、DELETE 等 HTTP 方法
+│   ├── actions/                  # Server Actions - 服务端操作函数
+│   │   │                        # 可在客户端直接调用的服务端函数，支持数据库操作等
+│   ├── layout.tsx                # 根布局和提供者 - 整个应用的通用布局
+│   │   │                        # 包含全局样式、字体、主题提供者等
+│   ├── not-found.tsx            # 404 页面 - 自定义未找到页面
 │   └── globals.css               # 全局样式使用 Tailwind v4
 ├── components/
-│   ├── biz/                      # 业务组件
-│   │   └── chat/                 # AI 聊天界面和流式传输
+│   ├── biz/                      # 业务组件（可复用的业务模块）
 │   └── ui/                       # 基础 UI 组件 (Shadcn/ui)
+│       │                        # 原子级 UI 组件，如按钮、输入框、卡片等
 ├── lib/
 │   ├── server-store/             # TanStack Query 数据层
+│   │   │                        # 管理服务端数据获取、缓存、状态同步
+│   ├── store/                    # 客户端状态管理（如 pipeline store）
+│   │   │                        # 使用 Zustand 或 Context API 管理客户端状态
 │   ├── request/                  # HTTP 请求工具
+│   │   │                        # 封装 fetch/axios，统一处理请求头、错误处理
 │   ├── services/                 # API 服务函数
-│   └── utils.ts                  # 工具函数 (cn 辅助函数)
-├── docs/                         # 项目文档
+│   │   │                        # 纯函数，封装具体的 API 调用逻辑
+│   └── utils.ts                  # 通用工具函数 (cn 辅助函数)
+│       │                        # 跨组件共享的纯工具函数，如样式类名合并等
 └── public/                       # 静态资源
+    │                           # 图片、字体、图标等静态文件
 ```
+
+### 页面路由专属资源管理原则
+
+1. **页面专属资源**：每个页面路由目录下的 `components/`、`utils/`、`types/` 仅用于该页面
+2. **共享资源提取**：当某个组件或工具函数需要被多个页面使用时，应将其提取到：
+   - `components/biz/` - 可复用的业务组件
+   - `components/ui/` - 可复用的基础 UI 组件
+   - `lib/utils.ts` - 可复用的通用工具函数
+3. **命名规范**：页面专属资源应使用明确的前缀或命名空间，避免与共享资源冲突
+
+### 路由组优势
+
+使用 `(main)` 路由组的好处：
+- **共享布局**：可以为组内所有页面提供统一的布局
+- **代码组织**：相关页面可以组织在一起，便于管理
+- **URL 简洁**：不会影响实际的 URL 路径（如 `/editor` 而不是 `/main/editor`）
 
 ## 环境配置
 

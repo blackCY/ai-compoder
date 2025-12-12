@@ -51,7 +51,6 @@ export async function runPipeline(
         assistantMessage = await runStreamText(streamOptions);
       }
 
-      // AI TODO 这里需要使用 vercel ai-sdk 来设置一个 Agent，让其对上一轮的输出做处理
       // 保存当前阶段的输出，供下一个阶段使用
       previousStageOutput = { role: "assistant", content: assistantMessage };
     } catch (error) {

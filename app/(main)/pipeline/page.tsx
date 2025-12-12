@@ -8,7 +8,8 @@ import { usePipeline, usePipelineState, useStage } from "@/lib/store/pipeline";
 // ============================================
 
 function Stage1Display() {
-  const { status, snapshot, final, error } = useStage<"business-code-generate", "stage-1">(
+  const { status, snapshot, final, error } = useStage(
+    "business-code-generate",
     "stage-1"
   );
   const data = final || snapshot;
@@ -62,7 +63,7 @@ function Stage1Display() {
                     {comp.description}
                   </p>
                   <div className="rounded bg-gray-100 p-2 text-xs font-mono text-gray-500 dark:bg-gray-950 dark:text-gray-500">
-                    {comp.api}
+                    {/* {comp.api} */}
                   </div>
                 </div>
               ))}
@@ -86,7 +87,8 @@ function Stage1Display() {
 // ============================================
 
 function Stage2Display() {
-  const { status, snapshot, final, error } = useStage<"business-code-generate", "stage-2">(
+  const { status, snapshot, final, error } = useStage(
+    "business-code-generate",
     "stage-2"
   );
   const data = final || snapshot;

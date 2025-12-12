@@ -115,30 +115,20 @@ function shallowEqual(a: StageState, b: StageState): boolean {
  */
 export function useStage<
   T extends PipelineTypeId,
-  S extends string = string
+  S extends keyof PipelineRegistry[T]
 >(
+  // TODO 这里优化一下，这个 typeId 目前没有用到，说明全部 pipeline 都合到一起了，得区分开
+  typeId: T,
   stageId: S
 ): {
   stageId: S;
   status: StageState["status"];
-  snapshot: [T] extends [never]
-    ? any
-    : T extends PipelineTypeId
-      ? S extends keyof PipelineRegistry[T]
-        ? PipelineRegistry[T][S]
-        : any
-      : any;
-  final: [T] extends [never]
-    ? any
-    : T extends PipelineTypeId
-      ? S extends keyof PipelineRegistry[T]
-        ? PipelineRegistry[T][S]
-        : any
-      : any;
+  snapshot: PipelineRegistry[T][S];
+  final: PipelineRegistry[T][S];
   error?: string;
 } {
   const stageAtom = useMemo(
-    () => selectAtom(stagesAtom, stages => stages[stageId] ?? defaultStageState, shallowEqual),
+    () => selectAtom(stagesAtom, stages => stages[stageId as string] ?? defaultStageState, shallowEqual),
     [stageId]
   );
 
