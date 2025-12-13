@@ -77,7 +77,7 @@ export function sendStageError(
     encoder,
     `event: stageError\ndata: ${JSON.stringify({
       id: stageId,
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? error.message : JSON.stringify(error),
     })}\n\n`
   );
 }

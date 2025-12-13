@@ -163,7 +163,7 @@ Remember: You are generating a complete, working React application using the spe
                 description: "Brief description of what this file contains"
               }
             },
-            required: ["fileName", "content", "description"],
+            required: ["fileName", "content", "description", "componentName"],
             additionalProperties: false
           },
           description: "Exactly 4 files: App.tsx, [ComponentName].tsx, styles.css, utils.ts"

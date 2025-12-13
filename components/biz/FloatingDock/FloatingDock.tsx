@@ -34,7 +34,7 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({
 
   return (
     <div className={cn("fixed bottom-8 left-0 right-0 w-full max-w-5xl mx-auto z-50 px-4", className)}>
-      <div className="relative flex flex-col items-center">
+      <div className="relative flex flex-col items-center" style={{ viewTransitionName: "floating-dock" }}>
         {/* Terminal Output with Animation */}
         <AnimatePresence mode="wait">
           {isTerminalVisible && (

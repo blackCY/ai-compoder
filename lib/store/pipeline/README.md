@@ -51,7 +51,7 @@ PipelinesMetaState = {
   "business-code-generate": {
     isRunning: boolean;
     error?: { stageId?: string; message: string };
-    finalOutput: any | null;
+    finalOutput: string | null;
     previousUserInput: string | null;
   };
   // 其他 pipeline 类型...

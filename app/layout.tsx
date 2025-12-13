@@ -4,6 +4,8 @@ import "./globals.css";
 import { ServerStoreQueryProvider } from "@/lib/server-store";
 import Script from "next/script";
 import { Provider } from "jotai";
+import { Toaster } from "@/components/ui/sonner";
+import { ViewTransitions } from "next-view-transitions";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,22 +28,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
-      <head>
-        {process.env.NODE_ENV === "development" && (
-          <Script
-            src="//unpkg.com/react-grab/dist/index.global.js"
-            crossOrigin="anonymous"
-            strategy="beforeInteractive"
-          />
-        )}
-      </head>
+    <ViewTransitions>
+      <html lang="zh-CN" suppressHydrationWarning data-scroll-behavior="smooth">
+        <head>
+          {process.env.NODE_ENV === "development" && (
+            <Script
+              src="//unpkg.com/react-grab/dist/index.global.js"
+              crossOrigin="anonymous"
+              strategy="beforeInteractive"
+            />
+          )}
+        </head>
 
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ServerStoreQueryProvider>
-          <Provider>{children}</Provider>
-        </ServerStoreQueryProvider>
-      </body>
-    </html>
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <ServerStoreQueryProvider>
+            <Provider>{children}</Provider>
+          </ServerStoreQueryProvider>
+          <Toaster />
+        </body>
+      </html>
+    </ViewTransitions>
   );
 }

@@ -662,3 +662,82 @@
     transition: none !important;
   }
 }
+
+/* View Transitions API - Page Transitions */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 旧页面淡出并向上移动 */
+::view-transition-old(root) {
+  animation-name: fade-out-up;
+}
+
+/* 新页面淡入并从下方进入 */
+::view-transition-new(root) {
+  animation-name: fade-in-up;
+}
+
+@keyframes fade-out-up {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 浮动输入框的共享元素过渡 */
+::view-transition-old(floating-dock),
+::view-transition-new(floating-dock) {
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  mix-blend-mode: normal;
+  overflow: visible;
+}
+
+/* 浮动输入框保持位置和大小的平滑过渡 */
+::view-transition-old(floating-dock) {
+  animation-name: dock-morph-out;
+}
+
+::view-transition-new(floating-dock) {
+  animation-name: dock-morph-in;
+}
+
+@keyframes dock-morph-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes dock-morph-in {
+  from {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

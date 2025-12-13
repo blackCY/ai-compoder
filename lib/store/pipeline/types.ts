@@ -89,3 +89,10 @@ export type SSEEventData =
   | SSEStageDeltaData
   | SSEStageFinalData
   | SSEStageErrorData;
+
+export type SSECallbacks = {
+  onStart?: (data: SSEEventData) => void;
+  onDelta?: (data: SSEStageDeltaData) => void;
+  onFinal?: (data: SSEStageFinalData) => void;
+  onError?: (data: SSEStageErrorData) => void;
+};

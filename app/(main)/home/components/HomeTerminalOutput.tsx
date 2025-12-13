@@ -3,16 +3,14 @@
 import { useEffect, useRef } from "react";
 import { Loader2 } from "lucide-react";
 import { useStage } from "@/lib/store/pipeline";
-import { StageOutputDisplay } from "./StageOutputDisplay";
-import { PipelineTerminalOutputProps } from "../types";
-import { PipelineRegistry } from "@/lib/store/pipeline/types";
+import { HomeStageOutputDisplay } from "./HomeStageOutputDisplay";
 
-export const PipelineTerminalOutput: React.FC<PipelineTerminalOutputProps> = ({
-  isVisible,
-  pipelineId,
-  stageId
-}) => {
-  const stage = useStage(pipelineId, stageId);
+interface HomeTerminalOutputProps {
+  isVisible: boolean;
+}
+
+export const HomeTerminalOutput: React.FC<HomeTerminalOutputProps> = ({ isVisible }) => {
+  const stage = useStage("business-code-generate", "stage-1");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when content updates during running state
@@ -78,7 +76,7 @@ export const PipelineTerminalOutput: React.FC<PipelineTerminalOutputProps> = ({
         </div>
 
         {/* Error Display */}
-        {stage.error && (
+        {stage.error ? (
           <div className="text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-3">
             <div className="font-semibold text-xs mb-1.5 flex items-center gap-1.5">
               <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
@@ -92,16 +90,11 @@ export const PipelineTerminalOutput: React.FC<PipelineTerminalOutputProps> = ({
             </div>
             <div className="text-xs font-sans">{stage.error}</div>
           </div>
-        )}
+        ) : null}
 
         {/* Output Display - show snapshot while running, final when done */}
         {(stage.final || stage.snapshot) && (
-          <StageOutputDisplay
-            output={
-              (stage.final ||
-                stage.snapshot) as PipelineRegistry["business-code-generate"]["stage-1"]
-            }
-          />
+          <HomeStageOutputDisplay output={stage.final || stage.snapshot} />
         )}
 
         {/* Idle State */}

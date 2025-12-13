@@ -19,11 +19,13 @@ export interface PipelineError {
  */
 export interface PipelineMetaState {
   isRunning: boolean;
+  currentStage: string | null; // 当前正在运行的阶段
+  currentStageStatus: StageState['status'] | null; // 当前阶段的状态
   error?: {
     stageId?: string;
     message: string;
   };
-  finalOutput: any | null;
+  finalOutput: string | null;
   previousUserInput: string | null;
 }
 
@@ -32,11 +34,13 @@ export interface PipelineMetaState {
  */
 export interface SinglePipelineState<T extends PipelineTypeId = PipelineTypeId> {
   isRunning: boolean;
+  currentStage: string | null; // 当前正在运行的阶段
+  currentStageStatus: StageState['status'] | null; // 当前阶段的状态
   error?: {
     stageId?: string;
     message: string;
   };
-  finalOutput: any | null;
+  finalOutput: string | null;
   previousUserInput: string | null;
   stages: Record<string, StageState>; // 该 pipeline 的所有 stage 状态
 }
@@ -72,6 +76,8 @@ export const defaultStageState: StageState = {
  */
 export const defaultPipelineMetaState: PipelineMetaState = {
   isRunning: false,
+  currentStage: null,
+  currentStageStatus: null,
   finalOutput: null,
   previousUserInput: null,
 };
@@ -135,12 +141,14 @@ export const updateStageAtom = atom(
     const stageKey = `${update.typeId}:${update.stageId}`;
     const currentStage = current[stageKey] || defaultStageState;
     
+    const newStageState = {
+      ...currentStage,
+      ...update.patch,
+    };
+    
     set(stagesAtom, {
       ...current,
-      [stageKey]: {
-        ...currentStage,
-        ...update.patch,
-      },
+      [stageKey]: newStageState,
     });
   }
 );

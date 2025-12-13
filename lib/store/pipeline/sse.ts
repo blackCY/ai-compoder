@@ -1,24 +1,21 @@
 import { runPipelineStream } from "@/lib/services";
 import {
   PipelineRunParams,
-  StageState,
   SSEEventData,
   SSEStageDeltaData,
   SSEStageFinalData,
   SSEStageErrorData,
+  SSECallbacks,
 } from "./types";
-
-type UpdateCallback = (update: { id: string; patch: Partial<StageState> }) => void;
 
 /**
  * 消费 SSE 流
  * @param params Pipeline 运行参数
- * @param updateStage 状态更新回调
+ * @param callbacks 各个阶段的回调函数
  */
 export async function consumeSSE(
   params: PipelineRunParams,
-  updateStage: UpdateCallback,
-  onFinalOutput?: (output: string) => void
+  callbacks: SSECallbacks
 ) {
   const res = await runPipelineStream(params);
 
@@ -44,7 +41,7 @@ export async function consumeSSE(
       buffer = parts.pop() || "";
 
       for (const block of parts) {
-        processSSEBlock(block, updateStage, onFinalOutput);
+        processSSEBlock(block, callbacks);
       }
     }
   } finally {
@@ -54,14 +51,13 @@ export async function consumeSSE(
   // Flush remaining buffer
   // This is normal if the stream didn't end with \n\n or if there was a final incomplete chunk
   if (buffer.trim()) {
-    processSSEBlock(buffer, updateStage, onFinalOutput);
+    processSSEBlock(buffer, callbacks);
   }
 }
 
 function processSSEBlock(
   block: string,
-  updateStage: UpdateCallback,
-  onFinalOutput?: (output: string) => void
+  callbacks: SSECallbacks
 ) {
   if (!block.trim()) return;
 
@@ -79,32 +75,25 @@ function processSSEBlock(
 
     switch (event) {
       case "stageStart":
-        updateStage({ id: data.id, patch: { status: "running", snapshot: "", final: "" } });
+        callbacks.onStart?.(data);
         break;
-      case "stageDelta": {
-        const delta = data as SSEStageDeltaData;
-        updateStage({ id: delta.id, patch: { snapshot: delta.snapshot } });
+      case "stageDelta":
+        callbacks.onDelta?.(data as SSEStageDeltaData);
         break;
-      }
-      case "stageFinal": {
-        const finalData = data as SSEStageFinalData;
-        updateStage({ id: finalData.id, patch: { status: "done", final: finalData.final } });
-        onFinalOutput?.(finalData.final);
+      case "stageFinal":
+        callbacks.onFinal?.(data as SSEStageFinalData);
         break;
-      }
-      case "stageError": {
-        const errorData = data as SSEStageErrorData;
-        updateStage({ id: errorData.id, patch: { status: "error", error: errorData.error } });
+      case "stageError":
+        callbacks.onError?.(data as SSEStageErrorData);
         break;
-      }
     }
   } catch (error) {
     console.error("Failed to parse SSE data:", error, dataStr);
     const idMatch = dataStr.match(/"id"\s*:\s*"([^"]+)"/);
-
-    updateStage({
+    
+    callbacks.onError?.({
       id: idMatch?.[1] || "Unmatched-Stage",
-      patch: { status: "error", error: `JSON Parse Error: ${(error as Error).message}` },
+      error: `JSON Parse Error: ${(error as Error).message}`,
     });
   }
 }
