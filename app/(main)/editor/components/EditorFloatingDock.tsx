@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { FloatingDock } from "@/components/biz/FloatingDock";
-import { usePipeline, usePipelineMeta } from "@/lib/store/pipeline";
+import { usePipeline, usePipelineState } from "@/lib/store/pipeline";
 import { EditorTerminalOutput } from "./EditorTerminalOutput";
 
 export const EditorFloatingDock: React.FC = () => {
   const { run } = usePipeline("business-code-generate");
-  const { currentStage, isRunning } = usePipelineMeta("business-code-generate");
+  const { currentStage, isRunning } = usePipelineState("business-code-generate");
   const [showTerminal, setShowTerminal] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 

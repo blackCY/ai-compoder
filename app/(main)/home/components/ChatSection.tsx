@@ -4,13 +4,13 @@ import { useState } from "react";
 import { useTransitionRouter } from "next-view-transitions";
 import { toast } from "sonner";
 import { FloatingDock } from "@/components/biz/FloatingDock";
-import { usePipeline, usePipelineMeta } from "@/lib/store/pipeline";
+import { usePipeline, usePipelineState } from "@/lib/store/pipeline";
 import { HomeTerminalOutput } from "./HomeTerminalOutput";
 
 export const ChatSection = () => {
   const router = useTransitionRouter();
   const { run } = usePipeline("business-code-generate");
-  const { isRunning } = usePipelineMeta("business-code-generate");
+  const { isRunning } = usePipelineState("business-code-generate");
   const [showTerminal, setShowTerminal] = useState(false);
 
   const handleGenerate = async (input: string) => {

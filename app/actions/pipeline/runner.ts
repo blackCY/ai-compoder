@@ -58,6 +58,6 @@ export async function runPipeline(
     }
   }
 
-  // 返回最后的结果
+  // 返回最后阶段的结果
   return assistantMessage;
 }

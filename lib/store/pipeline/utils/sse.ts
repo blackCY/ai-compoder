@@ -1,12 +1,12 @@
 import { runPipelineStream } from "@/lib/services";
+import { PipelineStreamParams } from "@/lib/services/pipeline/types";
 import {
-  PipelineRunParams,
   SSEEventData,
   SSEStageDeltaData,
   SSEStageFinalData,
   SSEStageErrorData,
   SSECallbacks,
-} from "./types";
+} from "../types";
 
 /**
  * 消费 SSE 流
@@ -14,7 +14,7 @@ import {
  * @param callbacks 各个阶段的回调函数
  */
 export async function consumeSSE(
-  params: PipelineRunParams,
+  params: PipelineStreamParams,
   callbacks: SSECallbacks
 ) {
   const res = await runPipelineStream(params);

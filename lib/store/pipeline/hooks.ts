@@ -1,240 +1,236 @@
 "use client";
 
 import { useAtomValue, useSetAtom } from "jotai";
-import { selectAtom, useAtomCallback } from "jotai/utils";
-import { useMemo } from "react";
-import {
-  pipelinesMetaAtom,
-  stagesAtom,
-  defaultStageState,
-  updatePipelineAtom,
-  updateStageAtom,
-  resetPipelineAtom,
-  SinglePipelineState,
-} from "./atoms";
-import { consumeSSE } from "./sse";
-import {
-  StageState
-} from "./types";
+import { useAtomCallback } from "jotai/utils";
+import { pipelineStateAtomFamily, pipelineStagesAtomFamily } from "./atoms";
+import { consumeSSE } from "./utils/sse";
+import { StageState, PipelineState, SSECallbacks, PipelineId } from "./types";
 import { ModelMessage } from "ai";
-import { PipelineTypeId, PipelineRegistry, SSECallbacks } from "./types";
+import { mergeData } from "./utils/mergeData";
 
-/**
- * usePipelineState - 获取指定 Pipeline 的完整状态
- * 包含 isRunning、error、stages 等信息
- * 注意：stages 是动态组合的，如果只需要元数据，考虑使用 usePipelineMeta
- *
- * @param typeId - Pipeline 类型 ID
- */
-export function usePipelineState<T extends PipelineTypeId>(typeId: T): SinglePipelineState<T> {
-  const metaAtom = useMemo(
-    () => selectAtom(pipelinesMetaAtom, pipelines => pipelines[typeId]),
-    [typeId]
-  );
-  const meta = useAtomValue(metaAtom);
+export function usePipelineState<P extends PipelineId>(pipelineId: P): PipelineState<P> {
+  return useAtomValue(pipelineStateAtomFamily(pipelineId)) as unknown as PipelineState<P>;
+}
 
-  // 获取该 pipeline 的所有 stages
-  const stagesMapAtom = useMemo(
-    () =>
-      selectAtom(stagesAtom, allStages => {
-        const prefix = `${typeId}:`;
-        const pipelineStages: Record<string, StageState> = {};
-        Object.entries(allStages).forEach(([key, value]) => {
-          if (key.startsWith(prefix)) {
-            const stageId = key.slice(prefix.length);
-            pipelineStages[stageId] = value;
-          }
-        });
-        return pipelineStages;
-      }),
-    [typeId]
-  );
-  const stages = useAtomValue(stagesMapAtom);
+export function usePipelineStateAction<P extends PipelineId>(pipelineId: P) {
+  const setPipelineState = useSetAtom(pipelineStateAtomFamily(pipelineId));
 
   return {
-    ...meta,
-    stages,
-  } as SinglePipelineState<T>;
+    /** pipeline 开始执行 */
+    start(userInput: PipelineState["previousUserInput"]) {
+      setPipelineState(prev => ({
+        ...prev,
+        isRunning: true,
+        error: undefined,
+        previousUserInput: userInput,
+      }));
+    },
+    /** pipeline 正常结束 */
+    finish(finalOutput: PipelineState["finalOutput"]) {
+      setPipelineState(prev => ({
+        ...prev,
+        isRunning: false,
+        finalOutput,
+      }));
+    },
+    /** pipeline 出错 */
+    fail(error: PipelineState["error"]) {
+      setPipelineState(prev => ({
+        ...prev,
+        isRunning: false,
+        error,
+      }));
+    },
+    /** 重置 pipeline 状态 */
+    reset() {
+      setPipelineState({
+        isRunning: false,
+        error: undefined,
+        currentStage: undefined,
+      });
+    },
+    /** 更新 currentStage */
+    setCurrentStage(stageId: string) {
+      setPipelineState(
+        prev =>
+          ({
+            ...prev,
+            currentStage: stageId,
+          } as PipelineState)
+      );
+    },
+  };
+}
+
+export function usePipelineStage<P extends PipelineId, S extends string>(
+  pipelineId: P,
+  stageId: S
+): StageState<P, S> {
+  return useAtomValue(
+    pipelineStagesAtomFamily(`${pipelineId}_${stageId}`)
+  ) as unknown as StageState<P, S>;
+}
+
+type ReduceStageEvent = Partial<StageState> & { type: "start" | "append" | "finish" | "error" };
+
+function reduceStage(prev: StageState, event: ReduceStageEvent): StageState {
+  switch (event.type) {
+    case "start":
+      return {
+        ...prev,
+        error: event.error,
+        status: event.status!,
+        snapshot: undefined,
+      };
+    case "append":
+      return {
+        ...prev,
+        snapshot: event.snapshot,
+      };
+    case "finish":
+      return {
+        ...prev,
+        status: event.status!,
+        final: event.final,
+        snapshot: event.final,
+      };
+    case "error":
+      return {
+        ...prev,
+        status: event.status!,
+        error: event.error,
+      };
+    default:
+      return prev;
+  }
 }
 
 /**
- * usePipelineMeta - 仅获取 Pipeline 的元数据（不包含 stages）
- * 性能更好，适合只需要 isRunning、error 等信息的场景
- * 包含 currentStage 信息
- *
- * @param typeId - Pipeline 类型 ID
+ * 返回可以直接在异步函数/回调中使用的 stage action 函数
+ * 支持读取当前 stage 状态用于合并
  */
-export function usePipelineMeta<T extends PipelineTypeId>(typeId: T) {
-  const metaAtom = useMemo(
-    () => selectAtom(pipelinesMetaAtom, pipelines => pipelines[typeId]),
-    [typeId]
-  );
-  return useAtomValue(metaAtom);
-}
-
-/**
- * usePipeline - 管理指定类型 Pipeline 的运行
- * 每次 run() 调用都是一个全新的任务
- * 支持类型安全的 pipeline 类型推断
- *
- * @param typeId - Pipeline 类型 ID
- */
-export function usePipeline<T extends PipelineTypeId>(typeId: T) {
-  const pipelineMeta = usePipelineMeta(typeId);
-  const updatePipeline = useSetAtom(updatePipelineAtom);
-  const resetPipeline = useSetAtom(resetPipelineAtom);
-
-  // 使用 useAtomCallback 避免闭包陷阱，直接读取最新的 atom 值
-  const handleStageUpdate = useAtomCallback(
-    (get, set, update: { id: string; patch: Partial<StageState> }) => {
-      // 更新 stage 状态
-      set(updateStageAtom, {
-        typeId,
-        stageId: update.id,
-        patch: update.patch,
-      });
-
-      // 读取最新的 pipeline meta 状态
-      const currentMeta = get(pipelinesMetaAtom)[typeId];
-
-      // 只在有实际变化时才更新
-      const needsUpdate =
-        currentMeta.currentStage !== update.id ||
-        currentMeta.currentStageStatus !== update.patch.status;
-
-      if (!needsUpdate) {
-        return;
-      }
-
-      set(updatePipelineAtom, {
-        typeId,
-        patch: {
-          currentStage: update.id,
-          currentStageStatus: update.patch.status,
-        },
-      });
+function usePipelineStageActions<P extends PipelineId>(pipelineId: P) {
+  const dispatchStage = useAtomCallback(
+    (get, set, { stageId, event }: { stageId: string; event: ReduceStageEvent }) => {
+      const atom = pipelineStagesAtomFamily(`${pipelineId}_${stageId}`);
+      set(atom, prev => reduceStage(prev, event));
     }
   );
 
+  const getStageState = useAtomCallback((get, _set, stageId: string) => {
+    const atom = pipelineStagesAtomFamily(`${pipelineId}_${stageId}`);
+    return get(atom);
+  });
+
+  return { dispatch: dispatchStage, getStageState };
+}
+
+/**
+ * usePipeline - 管理指定 Pipeline 的运行
+ * 每次 run() 调用都是一个全新的任务
+ * 支持类型安全的 pipeline 类型推断
+ *
+ * @param pipelineId - Pipeline ID
+ */
+export function usePipeline<T extends PipelineId>(pipelineId: T) {
+  const pipelineState = usePipelineState(pipelineId);
+  const pipelineActions = usePipelineStateAction(pipelineId);
+  const { dispatch: stageDispatcher, getStageState } = usePipelineStageActions(pipelineId);
+
   const run = async (input: string, callbacks?: SSECallbacks) => {
-    if (pipelineMeta.isRunning) return;
+    // 防止重复运行
+    if (pipelineState?.isRunning) return;
 
     // 1. 构建消息上下文
     const messages: ModelMessage[] = [];
-    const { previousUserInput, finalOutput } = pipelineMeta;
+    const { previousUserInput, finalOutput } = pipelineState || {};
 
     // 如果有上一轮对话上下文，插入历史记录
     if (previousUserInput && finalOutput) {
       messages.push({ role: "user", content: previousUserInput });
-      messages.push({ role: "assistant", content: finalOutput });
+      // 将 finalOutput 序列化为字符串（如果是对象）
+      const assistantContent =
+        typeof finalOutput === "string" ? finalOutput : JSON.stringify(finalOutput, null, 2);
+      messages.push({ role: "assistant", content: assistantContent });
     }
 
     // 始终添加当前用户输入
     messages.push({ role: "user", content: input });
 
-    // 2. 重置并更新状态
-    resetPipeline(typeId);
-    updatePipeline({
-      typeId,
-      patch: {
-        isRunning: true,
-        finalOutput: null,
-        previousUserInput: input,
-      },
-    });
+    // 2. 开始运行 pipeline
+    pipelineActions.start(input);
 
     try {
       await consumeSSE(
-        { messages, typeId },
+        { messages, typeId: pipelineId },
         {
-          onStart: (data) => {
-            handleStageUpdate({ id: data.id, patch: { status: "running", snapshot: "", final: "" } });
-            callbacks?.onStart?.(data);
-          },
-          onDelta: (data) => {
-            handleStageUpdate({ id: data.id, patch: { snapshot: data.snapshot, status: "running" } });
-            callbacks?.onDelta?.(data);
-          },
-          onFinal: (data) => {
-            handleStageUpdate({ id: data.id, patch: { status: "done", final: data.final } });
-            updatePipeline({
-              typeId,
-              patch: { finalOutput: data.final },
-            });
-            callbacks?.onFinal?.(data);
-          },
-          onError: (data) => {
-            handleStageUpdate({ id: data.id, patch: { status: "error", error: data.error } });
-            updatePipeline({
-              typeId,
-              patch: {
-                error: {
-                  stageId: data.id,
-                  message: data.error,
-                },
+          onStart: data => {
+            // 当 stage 开始时，更新 pipeline 的当前 stage
+            pipelineActions.setCurrentStage(data.id);
+            stageDispatcher({
+              stageId: data.id,
+              event: {
+                status: "running",
+                error: undefined,
+                type: "start",
               },
             });
+            callbacks?.onStart?.(data);
+          },
+          onDelta: data => {
+            stageDispatcher({
+              stageId: data.id,
+              event: {
+                snapshot: data.snapshot,
+                type: "append",
+              },
+            });
+            callbacks?.onDelta?.(data);
+          },
+          onFinal: data => {
+            // 获取当前 stage 状态，合并最终数据
+            const currentStage = getStageState(data.id);
+            const mergedFinal = mergeData(currentStage?.final, data.final);
+
+            if (data.id === "stage-2") {
+              console.log(currentStage.final, data.final, mergedFinal, "1111");
+            }
+
+            stageDispatcher({
+              stageId: data.id,
+              event: {
+                status: "done",
+                snapshot: mergedFinal,
+                final: mergedFinal,
+                type: "finish",
+              },
+            });
+            pipelineActions.finish(mergedFinal);
+            callbacks?.onFinal?.(data);
+          },
+          onError: data => {
+            // 标记 stage 错误
+            stageDispatcher({
+              stageId: data.id,
+              event: {
+                status: "error",
+                type: "error",
+                error: data.error,
+              },
+            });
+            pipelineActions.fail(data.error);
             callbacks?.onError?.(data);
           },
         }
       );
-    } finally {
-      updatePipeline({
-        typeId,
-        patch: { isRunning: false },
-      });
+    } catch (error) {
+      pipelineActions.fail(
+        error instanceof Error ? JSON.stringify(error.message) : "usePipeline error"
+      );
     }
   };
 
   return {
     run,
-  };
-}
-
-/**
- * 浅比较函数，用于 selectAtom
- */
-function shallowEqual(a: StageState, b: StageState): boolean {
-  return (
-    a.status === b.status && a.snapshot === b.snapshot && a.final === b.final && a.error === b.error
-  );
-}
-
-/**
- * useStage - 获取指定 Pipeline 的指定 Stage 状态
- * 使用独立的 stage key 存储，完全隔离不同 stage 的更新
- * 支持通过泛型进行类型安全的 schema 推断
- *
- * @param typeId - Pipeline 类型 ID，用于定位具体的 pipeline
- * @param stageId - Stage ID，必须是该 Pipeline 类型的有效 stage
- */
-export function useStage<T extends PipelineTypeId, S extends keyof PipelineRegistry[T]>(
-  typeId: T,
-  stageId: S
-): {
-  stageId: S;
-  status: StageState["status"];
-  snapshot: PipelineRegistry[T][S];
-  final: PipelineRegistry[T][S];
-  error?: string;
-} {
-  const stageAtom = useMemo(
-    () =>
-      selectAtom(
-        stagesAtom,
-        stages => {
-          const key = `${typeId}:${stageId as string}` as keyof typeof stages;
-          return stages[key] ?? defaultStageState;
-        },
-        shallowEqual
-      ),
-    [typeId, stageId]
-  );
-
-  const stageState = useAtomValue(stageAtom);
-
-  return {
-    stageId,
-    ...stageState,
   };
 }

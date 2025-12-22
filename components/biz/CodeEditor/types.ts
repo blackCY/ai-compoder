@@ -4,6 +4,7 @@ export interface CodeEditorProps {
   language?: string;
   filename?: string; // 文件名，用于自动识别语言
   placeholder?: string;
+  autoScroll?: boolean; // 是否自动滚动到底部
 }
 
 export interface CodeEditorRef {

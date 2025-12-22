@@ -5,27 +5,41 @@ import { CodeEditor } from "@/components/biz/CodeEditor";
 import { PreviewPanel } from "@/components/biz/PreviewPanel";
 import { EditorSidebar } from "./EditorSidebar";
 import { useState, useMemo, useEffect } from "react";
-import { useStage } from "@/lib/store/pipeline/hooks";
+import { usePipelineStage } from "@/lib/store/pipeline/hooks";
+import type { GeneratedFileName } from "@/lib/store/pipeline/types";
 
 export const EditorLayout: React.FC = () => {
-  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
-  const { final, snapshot } = useStage("business-code-generate", "stage-2");
+  const [selectedFileName, setSelectedFileName] = useState<GeneratedFileName | null>(null);
+  const { final, snapshot, status } = usePipelineStage("business-code-generate", "stage-2");
 
-  const files = snapshot?.files || [];
+  const filesMap = snapshot || {};
 
-  // Derive currentFile from selectedFileName - automatically syncs with streaming updates
-  const currentFile = useMemo(() => {
-    if (!selectedFileName || files.length === 0) return files[0] || null;
+  // 判断 stage-2 是否正在运行
+  const isStageRunning = status === "running";
 
-    return files.find(f => f.fileName === selectedFileName) || files[0];
-  }, [files, selectedFileName]);
-
-  // Auto-select first file when files are loaded
+  // 实时追踪 snapshot 的最后一个文件
   useEffect(() => {
-    if (!selectedFileName && currentFile) {
-      setSelectedFileName(currentFile.fileName)
+    if (isStageRunning && Object.keys(filesMap).length) {
+      // 获取 snapshot 中存在的最后一个文件
+      const existingFiles = Object.keys(filesMap) as GeneratedFileName[];
+      const lastFile = existingFiles[existingFiles.length - 1];
+      if (lastFile) {
+        setSelectedFileName(lastFile);
+      }
     }
-  }, [currentFile, selectedFileName]);
+  }, [filesMap, isStageRunning]);
+
+  // 当前显示的文件
+  const currentFilesMap = isStageRunning ? snapshot : final;
+  const currentFile =
+    selectedFileName && currentFilesMap?.[selectedFileName]
+      ? { fileName: selectedFileName, ...currentFilesMap[selectedFileName] }
+      : null;
+
+  // 侧边栏显示的文件名列表
+  const sidebarFileNames = final
+    ? Object.keys(final)
+    : Object.keys(snapshot || {});
 
   const previewContent = useMemo(() => {
     if (!final) return null;
@@ -45,13 +59,18 @@ export const EditorLayout: React.FC = () => {
 
       {/* Sidebar */}
       <EditorSidebar
-        fileNames={files.map(file => file.fileName)}
-        currentFileName={selectedFileName}
-        onFileSelect={setSelectedFileName}
+        fileNames={sidebarFileNames}
+        activeFileName={selectedFileName}
+        onFileSelect={name => setSelectedFileName(name as GeneratedFileName)}
+        disabled={isStageRunning}
       />
 
       {/* Editor */}
-      <CodeEditor code={currentFile?.content} filename={currentFile?.fileName} />
+      <CodeEditor
+        code={currentFile?.content}
+        filename={currentFile?.fileName}
+        autoScroll={isStageRunning}
+      />
 
       {/* Preview */}
       {previewContent}

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Loader2 } from "lucide-react";
-import { useStage } from "@/lib/store/pipeline";
+import { usePipelineStage } from "@/lib/store/pipeline";
 import { HomeStageOutputDisplay } from "./HomeStageOutputDisplay";
 
 interface HomeTerminalOutputProps {
@@ -10,15 +10,38 @@ interface HomeTerminalOutputProps {
 }
 
 export const HomeTerminalOutput: React.FC<HomeTerminalOutputProps> = ({ isVisible }) => {
-  const stage = useStage("business-code-generate", "stage-1");
+  const stage = usePipelineStage("business-code-generate", "stage-1");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when content updates during running state
+  // Auto-scroll to bottom when content changes with smooth animation
   useEffect(() => {
-    if (stage.status === "running" && scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
-    }
-  }, [stage.snapshot, stage.status]);
+    const container = scrollContainerRef.current;
+    const content = contentRef.current;
+    if (!container || !content) return;
+
+    const scrollToBottom = () => {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+    };
+
+    // Initial scroll
+    scrollToBottom();
+
+    // Watch for content changes
+    const observer = new MutationObserver(scrollToBottom);
+    observer.observe(content, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [stage.snapshot, stage.final]);
 
   if (!isVisible) return null;
 
@@ -27,7 +50,7 @@ export const HomeTerminalOutput: React.FC<HomeTerminalOutputProps> = ({ isVisibl
       ref={scrollContainerRef}
       className="w-full bg-gray-900/90 backdrop-blur-md border border-gray-800/50 rounded-t-2xl border-b-0 font-mono text-sm min-h-[120px] max-h-[400px] overflow-y-auto scrollbar-hide"
     >
-      <div className="p-4">
+      <div ref={contentRef} className="p-4">
         {/* Stage Status Header */}
         <div className="mb-3 pb-2 border-b border-gray-700/30 flex items-center sticky top-0 bg-gray-900/90 backdrop-blur-md z-10 -mx-4 px-4">
           {stage.status === "running" && (
@@ -94,7 +117,7 @@ export const HomeTerminalOutput: React.FC<HomeTerminalOutputProps> = ({ isVisibl
 
         {/* Output Display - show snapshot while running, final when done */}
         {(stage.final || stage.snapshot) && (
-          <HomeStageOutputDisplay output={stage.final || stage.snapshot} />
+          <HomeStageOutputDisplay output={stage.final || stage.snapshot || ''} />
         )}
 
         {/* Idle State */}

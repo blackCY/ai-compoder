@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
-import { useStage } from "@/lib/store/pipeline";
+import { usePipelineStage } from "@/lib/store/pipeline";
 import { StageOutputDisplay } from "./StageOutputDisplay";
 
 interface EditorTerminalOutputProps {
@@ -16,20 +16,40 @@ export const EditorTerminalOutput: React.FC<EditorTerminalOutputProps> = ({
   isCollapsed = false,
   onToggleCollapse,
 }) => {
-  const stage = useStage("business-code-generate", "stage-1");
+  const { snapshot, final, status, error } = usePipelineStage("business-code-generate", "stage-1");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when content updates during running state
+  // Auto-scroll to bottom when content changes with smooth animation
   useEffect(() => {
-    if (stage.status === "running" && scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
-    }
-  }, [stage.snapshot, stage.status]);
+    const container = scrollContainerRef.current;
+    const content = contentRef.current;
+    if (!container || !content) return;
+
+    const scrollToBottom = () => {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+    };
+
+    // Initial scroll
+    scrollToBottom();
+
+    // Watch for content changes
+    const observer = new MutationObserver(scrollToBottom);
+    observer.observe(content, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [snapshot, final]);
 
   if (!isVisible) return null;
-
-  // 是否可以收起：stage.final 有值且 status 不是 running
-  const canCollapse = stage.final && stage.status !== "running";
 
   return (
     <div
@@ -40,11 +60,11 @@ export const EditorTerminalOutput: React.FC<EditorTerminalOutputProps> = ({
         maxHeight: isCollapsed ? "56px" : "400px",
       }}
     >
-      <div className="p-4">
-          {/* Stage Status Header */}
-          <div className="mb-3 pb-2 border-b border-gray-700/30 flex items-center justify-between sticky top-0 bg-gray-900/90 backdrop-blur-md z-10 -mx-4 px-4 min-h-[32px]">
+      <div ref={contentRef} className="p-4">
+        {/* Stage Status Header */}
+        <div className="mb-3 pb-2 border-b border-gray-700/30 flex items-center justify-between sticky top-0 bg-gray-900/90 backdrop-blur-md z-10 -mx-4 px-4 min-h-[32px]">
           <div className="flex items-center">
-            {stage.status === "running" && (
+            {status === "running" && (
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400 mr-2" />
                 <span className="text-emerald-400 font-semibold text-xs">
@@ -52,7 +72,7 @@ export const EditorTerminalOutput: React.FC<EditorTerminalOutputProps> = ({
                 </span>
               </>
             )}
-            {stage.status === "done" && (
+            {status === "done" && (
               <>
                 <svg
                   className="w-3.5 h-3.5 text-green-400 mr-2"
@@ -68,7 +88,7 @@ export const EditorTerminalOutput: React.FC<EditorTerminalOutputProps> = ({
                 <span className="text-green-400 font-semibold text-xs">Analysis Complete</span>
               </>
             )}
-            {stage.status === "error" && (
+            {status === "error" && (
               <>
                 <svg
                   className="w-3.5 h-3.5 text-red-400 mr-2"
@@ -84,13 +104,13 @@ export const EditorTerminalOutput: React.FC<EditorTerminalOutputProps> = ({
                 <span className="text-red-400 font-semibold text-xs">Analysis Failed</span>
               </>
             )}
-            {stage.status === "idle" && (
+            {status === "idle" && (
               <span className="text-gray-400 font-semibold text-xs">Ready</span>
             )}
           </div>
 
           {/* Collapse Toggle Button */}
-          {canCollapse && onToggleCollapse && (
+          {status !== "running" && onToggleCollapse ? (
             <button
               onClick={onToggleCollapse}
               className="text-gray-400 hover:text-gray-200 transition-colors p-1.5 rounded hover:bg-gray-800/50 cursor-pointer flex-shrink-0"
@@ -102,14 +122,14 @@ export const EditorTerminalOutput: React.FC<EditorTerminalOutputProps> = ({
                 <ChevronDown className="w-4 h-4" />
               )}
             </button>
-          )}
+          ) : null}
         </div>
 
         {/* Content - hidden when collapsed */}
         {!isCollapsed && (
           <>
             {/* Error Display */}
-            {stage.error ? (
+            {error ? (
               <div className="text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-3">
                 <div className="font-semibold text-xs mb-1.5 flex items-center gap-1.5">
                   <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
@@ -121,17 +141,15 @@ export const EditorTerminalOutput: React.FC<EditorTerminalOutputProps> = ({
                   </svg>
                   Error
                 </div>
-                <div className="text-xs font-sans">{stage.error}</div>
+                <div className="text-xs font-sans">{error}</div>
               </div>
             ) : null}
 
             {/* Output Display - show snapshot while running, final when done */}
-            {(stage.final || stage.snapshot) && (
-              <StageOutputDisplay output={stage.final || stage.snapshot} />
-            )}
+            {snapshot && <StageOutputDisplay output={snapshot || ""} />}
 
             {/* Idle State */}
-            {stage.status === "idle" && (
+            {status === "idle" && (
               <div className="text-gray-400 text-center py-8">
                 <svg
                   className="w-10 h-10 mx-auto mb-2 opacity-40"
