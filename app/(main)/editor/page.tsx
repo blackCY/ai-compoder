@@ -1,6 +1,13 @@
+"use client";
+
+import { useRef, useState } from "react";
 import { EditorLayout, EditorFloatingDock } from "./components";
+import type { EditorFloatingDockRef } from "./components";
 
 export default function EditorPage() {
+  const dockRef = useRef<EditorFloatingDockRef>(null);
+  const [disabled, setDisabled] = useState(false);
+
   return (
     <div
       className="min-h-screen bg-[#0a0b0e] text-[#e1e3e8] font-['Syne',sans-serif] overflow-hidden"
@@ -9,10 +16,20 @@ export default function EditorPage() {
       }}
     >
       {/* Main Layout Grid */}
-      <EditorLayout />
+      <EditorLayout
+        onError={(error: Error) => {
+          dockRef.current
+            ?.generate(`之前的需求已经生成了代码，但运行时出现错误。请修复以下错误并重新生成可用的代码。
+
+            错误信息：${error.message}
+
+            请保持原有功能，只修复错误`);
+        }}
+        onUnsaveChange={setDisabled}
+      />
 
       {/* Floating Dock */}
-      <EditorFloatingDock />
+      <EditorFloatingDock ref={dockRef} disabled={disabled} />
     </div>
   );
 }

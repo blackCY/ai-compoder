@@ -31,13 +31,14 @@ export default function RootLayout({
     <ViewTransitions>
       <html lang="zh-CN" suppressHydrationWarning data-scroll-behavior="smooth">
         <head>
-          {process.env.NODE_ENV === "development" && (
+          {/* 使用这个调试工具后，在页面上直接选择"未阻止冒泡的文本"（没有使用该工具来选择）时，会导致页面卡死，因此这里暂时注释掉 */}
+          {/* {process.env.NODE_ENV === "development" && (
             <Script
               src="//unpkg.com/react-grab/dist/index.global.js"
               crossOrigin="anonymous"
               strategy="beforeInteractive"
             />
-          )}
+          )} */}
         </head>
 
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>

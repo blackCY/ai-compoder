@@ -1,21 +1,55 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { CodeEditor } from "@/components/biz/CodeEditor";
-import { PreviewPanel } from "@/components/biz/PreviewPanel";
+import { PreviewPanel } from "./PreviewPanel";
 import { EditorSidebar } from "./EditorSidebar";
 import { useState, useMemo, useEffect } from "react";
-import { usePipelineStage } from "@/lib/store/pipeline/hooks";
-import type { GeneratedFileName } from "@/lib/store/pipeline/types";
+import { usePipelineStage, useStageUpdate } from "@/lib/store/pipeline/hooks";
+import type { GeneratedFileName, Stage2Output } from "@/lib/store/pipeline/types";
+import type { FileMap } from "react-renderer";
 
-export const EditorLayout: React.FC = () => {
+/**
+ * 将 Stage2Output 转换为 FileMap
+ */
+function toFileMap(output: Stage2Output | undefined): FileMap | undefined {
+  if (!output) return undefined;
+
+  const fileMap: FileMap = {};
+
+  for (const [fileName, fileContent] of Object.entries(output)) {
+    if (fileContent?.content) {
+      fileMap[fileName] = fileContent.content;
+    }
+  }
+
+  return Object.keys(fileMap).length > 0 ? fileMap : undefined;
+}
+
+export interface EditorLayoutProps {
+  onError?: (error: Error) => void;
+  onUnsaveChange?: (saveStatus: boolean) => void;
+}
+
+export const EditorLayout: React.FC<EditorLayoutProps> = ({ onError, onUnsaveChange }) => {
   const [selectedFileName, setSelectedFileName] = useState<GeneratedFileName | null>(null);
   const { final, snapshot, status } = usePipelineStage("business-code-generate", "stage-2");
+
+  // 使用 useStageUpdate hook
+  const { updateStage } = useStageUpdate("business-code-generate", "stage-2", true);
+
+  // 编辑后的文件内容（一开始为空，changed 时存入）
+  const [editedFiles, setEditedFiles] = useState<Stage2Output>({});
+  // 是否有未保存更改
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const filesMap = snapshot || {};
 
   // 判断 stage-2 是否正在运行
   const isStageRunning = status === "running";
+
+  // 是否显示预览面板
+  const showPreview = !!final;
 
   // 实时追踪 snapshot 的最后一个文件
   useEffect(() => {
@@ -29,7 +63,7 @@ export const EditorLayout: React.FC = () => {
     }
   }, [filesMap, isStageRunning]);
 
-  // 当前显示的文件
+  // 当前显示的文件（用于侧边栏等）
   const currentFilesMap = isStageRunning ? snapshot : final;
   const currentFile =
     selectedFileName && currentFilesMap?.[selectedFileName]
@@ -37,18 +71,57 @@ export const EditorLayout: React.FC = () => {
       : null;
 
   // 侧边栏显示的文件名列表
-  const sidebarFileNames = final
-    ? Object.keys(final)
-    : Object.keys(snapshot || {});
+  const sidebarFileNames = final ? Object.keys(final) : Object.keys(snapshot || {});
 
-  const previewContent = useMemo(() => {
-    if (!final) return null;
-    return <PreviewPanel />;
-  }, [final]);
+  // 编辑器显示的代码：优先用 editedFiles，否则用 currentFile.content
+  const showEditorCode =
+    selectedFileName && editedFiles[selectedFileName]
+      ? editedFiles[selectedFileName].content
+      : currentFile?.content;
+
+  const previewFileMap = useMemo(() => toFileMap(final), [final]);
+
+  const handleUnSavedChanges = (isSave: boolean) => {
+    setHasUnsavedChanges(isSave)
+    onUnsaveChange?.(isSave)
+  }
+
+  // 处理代码变化
+  const handleCodeChange = (newCode: string) => {
+    if (!selectedFileName || !final) return;
+
+    setEditedFiles(prev => ({
+      ...prev,
+      [selectedFileName]: {
+        ...final[selectedFileName],
+        content: newCode,
+      },
+    }));
+    handleUnSavedChanges(true);
+  };
+
+  // 处理保存
+  const handleSave = () => {
+    if (!hasUnsavedChanges || !final) return;
+
+    // 合并 final 和 editedFiles
+    const mergedFiles: Stage2Output = {
+      ...final,
+      ...editedFiles,
+    };
+
+    updateStage(mergedFiles);
+    setEditedFiles({});
+    handleUnSavedChanges(false);
+  };
 
   return (
     <motion.div
-      className="grid grid-rows-[50px_1fr] grid-cols-[240px_1fr_1fr] h-screen opacity-0"
+      className="grid grid-rows-[50px_1fr] opacity-0"
+      style={{
+        gridTemplateColumns: showPreview ? "240px 1fr 1fr" : "240px 1fr",
+        height: "calc(100vh - 120px)",
+      }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
     >
@@ -63,17 +136,39 @@ export const EditorLayout: React.FC = () => {
         activeFileName={selectedFileName}
         onFileSelect={name => setSelectedFileName(name as GeneratedFileName)}
         disabled={isStageRunning}
+        hasUnsavedChanges={hasUnsavedChanges}
+        onSave={handleSave}
       />
 
       {/* Editor */}
       <CodeEditor
-        code={currentFile?.content}
+        code={showEditorCode}
         filename={currentFile?.fileName}
-        autoScroll={isStageRunning}
+        readOnly={isStageRunning}
+        onChange={handleCodeChange}
       />
 
-      {/* Preview */}
-      {previewContent}
+      {/* Preview with slide-in animation */}
+      <AnimatePresence>
+        {showPreview && (
+          <motion.div
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: "100%", opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{
+              duration: 0.5,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          >
+            <PreviewPanel
+              fileMap={previewFileMap}
+              entryFile="App.tsx"
+              className="h-full"
+              onAutoFix={onError}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

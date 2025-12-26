@@ -4,7 +4,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { pipelineStateAtomFamily, pipelineStagesAtomFamily } from "./atoms";
 import { consumeSSE } from "./utils/sse";
-import { StageState, PipelineState, SSECallbacks, PipelineId } from "./types";
+import { StageState, PipelineState, SSECallbacks, PipelineId, StageOutput } from "./types";
 import { ModelMessage } from "ai";
 import { mergeData } from "./utils/mergeData";
 
@@ -126,6 +126,42 @@ function usePipelineStageActions<P extends PipelineId>(pipelineId: P) {
 }
 
 /**
+ * useStageUpdate - 用于手动更新 stage 数据
+ *
+ * @param pipelineId - Pipeline ID
+ * @param stageId - Stage ID
+ * @param isFinal - 是否是最后一个阶段，最后阶段会同步到 pipelineState.finalOutput
+ */
+export function useStageUpdate<P extends PipelineId, S extends string>(
+  pipelineId: P,
+  stageId: S,
+  isFinal: boolean = false
+) {
+  const { finish } = usePipelineStateAction(pipelineId);
+  const { dispatch } = usePipelineStageActions(pipelineId);
+
+  const updateStage = (newData: StageOutput<P, S>) => {
+    // 更新 stage 的 final 和 snapshot
+    dispatch({
+      stageId,
+      event: {
+        type: "finish",
+        status: "done",
+        final: newData,
+        snapshot: newData,
+      },
+    });
+
+    // 如果是最后一个阶段，同步到 pipelineState.finalOutput
+    if (isFinal) {
+      finish(newData as PipelineState["finalOutput"]);
+    }
+  };
+
+  return { updateStage };
+}
+
+/**
  * usePipeline - 管理指定 Pipeline 的运行
  * 每次 run() 调用都是一个全新的任务
  * 支持类型安全的 pipeline 类型推断
@@ -191,10 +227,6 @@ export function usePipeline<T extends PipelineId>(pipelineId: T) {
             // 获取当前 stage 状态，合并最终数据
             const currentStage = getStageState(data.id);
             const mergedFinal = mergeData(currentStage?.final, data.final);
-
-            if (data.id === "stage-2") {
-              console.log(currentStage.final, data.final, mergedFinal, "1111");
-            }
 
             stageDispatcher({
               stageId: data.id,

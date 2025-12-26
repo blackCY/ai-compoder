@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "react-renderer": ["./artifacts/react-renderer/src/index.ts"]
     }
   },
   "include": [

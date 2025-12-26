@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { CodeEditorProps } from "./types";
 import { getLanguageFromFilename } from "@/components/biz/CodeEditor/utils";
@@ -13,12 +13,19 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   language,
   filename,
   placeholder = "// Start coding...",
-  autoScroll = false,
+  readOnly = false,
+  onChange,
 }) => {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 
   // 优先使用 language，否则从 filename 推断
   const detectedLanguage = language || getLanguageFromFilename(filename);
+
+  // 处理编辑器内容变化
+  const handleEditorChange = (value: string | undefined) => {
+    if (readOnly || !value) return;
+    onChange?.(value);
+  };
 
   const handleEditorMount: OnMount = editorInstance => {
     editorRef.current = editorInstance;
@@ -26,8 +33,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
 
   const handleEditorBeforeMount: BeforeMount = monaco => {
     monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-      noSemanticValidation: true, // 关掉类型 & 依赖解析错误
-      noSyntaxValidation: false, // 保留语法错误
+      noSemanticValidation: true,
+      noSyntaxValidation: false,
     });
 
     monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
@@ -37,26 +44,25 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     });
   };
 
-  // 自动滚动到底部
+  // 自动滚动到底部（仅在 readOnly 模式下）
   useEffect(() => {
-    if (autoScroll && editorRef.current && code) {
-      // 使用 requestAnimationFrame 确保 DOM 更新后再滚动
+    if (readOnly && editorRef.current && code) {
       requestAnimationFrame(() => {
         if (editorRef.current) {
           const model = editorRef.current.getModel();
           if (model) {
             const lineCount = model.getLineCount();
-            editorRef.current.revealLine(lineCount, 1); // 1 = ScrollType.Immediate
+            editorRef.current.revealLine(lineCount, 1);
           }
         }
       });
     }
-  }, [autoScroll, code]);
+  }, [readOnly, code]);
 
   return (
     <div
       className={cn(
-        "glass-morphism rounded-lg overflow-hidden border border-slate-700",
+        "relative glass-morphism rounded-lg overflow-hidden border border-slate-700",
         "bg-slate-900/50 backdrop-blur-sm",
         "transition-all duration-300 ease-in-out",
         className
@@ -74,6 +80,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         theme="vs-dark"
         onMount={handleEditorMount}
         beforeMount={handleEditorBeforeMount}
+        onChange={handleEditorChange}
         options={{
           minimap: { enabled: false },
           lineNumbers: "on",
@@ -82,8 +89,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           cursorBlinking: "smooth",
           wordWrap: "on",
           wrappingStrategy: "advanced",
-          readOnly: autoScroll, // 生成中只读,完成后可编辑
-          // padding: { top: 16, bottom: 16 }, // 添加上下内边距,确保最后一行完全可见
+          readOnly,
         }}
       />
     </div>

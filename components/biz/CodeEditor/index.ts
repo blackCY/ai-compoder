@@ -1,2 +1,2 @@
 export { CodeEditor } from './CodeEditor';
-export type { CodeEditorProps, CodeEditorRef } from './types';
+export type { CodeEditorProps } from './types';
