@@ -131,26 +131,26 @@ export async function runStreamObject(options: StreamObjectOptions) {
     },
   });
 
-  let finalObject: Record<string, any> = {};
+  let finalObject: Record<string, unknown> = {};
 
   for await (const partialObject of result.partialObjectStream) {
-    finalObject = partialObject as Record<string, any>;
+    finalObject = partialObject as Record<string, unknown>;
     sendStageDelta(controller, encoder, stageId, finalObject);
   }
 
   const usage = await result.usage;
   console.log(usage, "runStreamObject--" + stageId);
 
-  sendStageFinal(controller, encoder, stageId, finalObject);
+  sendStageFinal(controller, encoder, stageId, finalObject as Record<string, unknown>);
 
   console.log(finalObject, 'finalObject')
 
-  return finalObject;
+  return finalObject as Record<string, unknown>;
 }
 
 type StreamResourcesOption = Pick<StreamOptions, "resources" | "systemPrompt" | "messages"> & {
   onError?: (error: Error | unknown) => void;
-  onDelta?: (delta: any) => void;
+  onDelta?: (delta: unknown) => void;
 };
 
 /**

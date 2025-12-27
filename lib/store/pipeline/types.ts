@@ -90,12 +90,12 @@ export interface SSEStageStartData {
   id: string;
 }
 
-export interface SSEStageDeltaData<S = any> {
+export interface SSEStageDeltaData<S = unknown> {
   id: string;
   snapshot: S;
 }
 
-export interface SSEStageFinalData<F = any> {
+export interface SSEStageFinalData<F = unknown> {
   id: string;
   final: F;
 }

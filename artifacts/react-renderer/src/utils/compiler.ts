@@ -1,5 +1,7 @@
 // @ts-expect-error - @babel/standalone has no type definitions
 import Babel from '@babel/standalone';
+import * as jsxRuntime from 'react/jsx-runtime';
+import * as jsxDevRuntime from 'react/jsx-dev-runtime';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import type { ComponentType } from 'react';
@@ -35,8 +37,8 @@ const DEFAULT_PRESETS = [
 const BUILTIN_DEPENDENCIES: Record<string, unknown> = {
   react: React,
   'react-dom': ReactDOM,
-  'react/jsx-runtime': require('react/jsx-runtime'),
-  'react/jsx-dev-runtime': require('react/jsx-dev-runtime'),
+  'react/jsx-runtime': jsxRuntime,
+  'react/jsx-dev-runtime': jsxDevRuntime,
 };
 
 /**

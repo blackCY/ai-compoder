@@ -16,7 +16,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
           queries: {
             staleTime: 60 * 1000, // 1 minute
             refetchOnWindowFocus: false,
-            retry: (failureCount, error) => {
+            retry: (failureCount, _error) => {
               // 对于网络错误，重试最多2次
               if (failureCount < 2) return true
               return false

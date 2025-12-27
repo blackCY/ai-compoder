@@ -7,7 +7,7 @@ if (typeof global !== "undefined" && typeof global.__dirname === "undefined") {
 }
 
 if (typeof window !== "undefined" && typeof window.__dirname === "undefined") {
-  (window as any).__dirname = "/mock/dir";
+  (window as unknown as { __dirname: string }).__dirname = "/mock/dir";
 }
 
 const preview: Preview = {

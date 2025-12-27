@@ -1,2 +1,2 @@
 export { FloatingDock } from './FloatingDock';
-export type { FloatingDockProps, FloatingDockRef } from './types';
+export type { FloatingDockProps } from './types';

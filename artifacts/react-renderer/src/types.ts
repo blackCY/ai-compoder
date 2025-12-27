@@ -1,4 +1,4 @@
-import type { ComponentType, ReactNode } from 'react';
+import type { ComponentType } from 'react';
 
 /**
  * 文件映射表

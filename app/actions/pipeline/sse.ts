@@ -38,7 +38,7 @@ export function sendStageDelta(
   controller: ReadableStreamDefaultController,
   encoder: TextEncoder,
   stageId: string,
-  snapshot: string | Record<string, any>
+  snapshot: string | Record<string, unknown>
 ) {
   enqueue(
     controller,
@@ -54,7 +54,7 @@ export function sendStageFinal(
   controller: ReadableStreamDefaultController,
   encoder: TextEncoder,
   stageId: string,
-  final: string | Record<string, any>
+  final: string | Record<string, unknown>
 ) {
   enqueue(
     controller,
