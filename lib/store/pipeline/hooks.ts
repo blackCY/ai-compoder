@@ -17,7 +17,7 @@ export function usePipelineStateAction<P extends PipelineId>(pipelineId: P) {
 
   return {
     /** pipeline 开始执行 */
-    start(userInput: PipelineState["previousUserInput"]) {
+    start(userInput: PipelineState<P>["previousUserInput"]) {
       setPipelineState(prev => ({
         ...prev,
         isRunning: true,
@@ -26,15 +26,15 @@ export function usePipelineStateAction<P extends PipelineId>(pipelineId: P) {
       }));
     },
     /** pipeline 正常结束 */
-    finish(finalOutput: PipelineState["finalOutput"]) {
+    finish(finalOutput: PipelineState<P>["finalOutput"]) {
       setPipelineState(prev => ({
         ...prev,
         isRunning: false,
         finalOutput,
-      }));
+      } as PipelineState));
     },
     /** pipeline 出错 */
-    fail(error: PipelineState["error"]) {
+    fail(error: PipelineState<P>["error"]) {
       setPipelineState(prev => ({
         ...prev,
         isRunning: false,
@@ -154,7 +154,7 @@ export function useStageUpdate<P extends PipelineId, S extends string>(
 
     // 如果是最后一个阶段，同步到 pipelineState.finalOutput
     if (isFinal) {
-      finish(newData as PipelineState["finalOutput"]);
+      finish(newData as PipelineState<P>["finalOutput"]);
     }
   };
 
@@ -237,7 +237,7 @@ export function usePipeline<T extends PipelineId>(pipelineId: T) {
                 type: "finish",
               },
             });
-            pipelineActions.finish(mergedFinal);
+            pipelineActions.finish(mergedFinal as PipelineState<T>["finalOutput"]);
             callbacks?.onFinal?.(data);
           },
           onError: data => {
