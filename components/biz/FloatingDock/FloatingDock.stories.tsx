@@ -25,8 +25,8 @@ export const Default: Story = {
 
 export const WithCallback: Story = {
   args: {
-    onCommand: (command: string) => {
-      console.log('Command executed:', command);
+    onGenerate: (input: string) => {
+      console.log('Command executed:', input);
     },
   },
 };
