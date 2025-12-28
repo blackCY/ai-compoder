@@ -1,3 +1,5 @@
+import { StageUsage } from "./types";
+
 /**
  * SSE 事件发送工具函数
  * 用于向前端推送多阶段 Pipeline 的状态更新
@@ -54,12 +56,17 @@ export function sendStageFinal(
   controller: ReadableStreamDefaultController,
   encoder: TextEncoder,
   stageId: string,
-  final: string | Record<string, unknown>
+  final: string | Record<string, unknown>,
+  meta?: { usage?: StageUsage }
 ) {
+  const payload: Record<string, unknown> = { id: stageId, final };
+  if (meta) {
+    payload.meta = meta;
+  }
   enqueue(
     controller,
     encoder,
-    `event: stageFinal\ndata: ${JSON.stringify({ id: stageId, final })}\n\n`
+    `event: stageFinal\ndata: ${JSON.stringify(payload)}\n\n`
   );
 }
 

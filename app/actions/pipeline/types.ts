@@ -1,5 +1,16 @@
-import { ModelMessage } from "ai";
+import { ModelMessage, LanguageModelUsage } from "ai";
 import { JsonSchema } from "json-schema-to-zod";
+
+// ============================================
+// Usage Types
+// ============================================
+
+/**
+ * 扩展 Usage 类型，支持嵌套子调用
+ */
+export interface StageUsage extends LanguageModelUsage {
+  childrenUsages?: LanguageModelUsage[];
+}
 
 // ============================================
 // Multi-Stage AI Pipeline - Core Types

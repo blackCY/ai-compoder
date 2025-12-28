@@ -2,7 +2,7 @@ import { streamText, streamObject, ModelMessage } from "ai";
 import { getModel, getModelWithStructure } from "../getModel";
 import { jsonSchemaToZod } from "./utils/jsonSchemaToZod";
 import { sendStageDelta, sendStageError, sendStageFinal, sendStageStart } from "./sse";
-import { Resource } from "./types";
+import { Resource, StageUsage } from "./types";
 import {
   buildSystemPrompt,
   buildSingleResourcePrompt,
@@ -57,12 +57,19 @@ export async function runStreamText(options: StreamOptions): Promise<string> {
     });
 
     const fullText = buildFullResourcePrompt(result.analysis, result.resources);
-    sendStageFinal(controller, encoder, stageId, fullText);
+    
+    // 构建 usage，将 runStreamResources 的 usage 作为 childrenUsages
+    const usage: StageUsage = {
+      ...result.usage,
+      childrenUsages: [result.usage],
+    };
+    
+    sendStageFinal(controller, encoder, stageId, fullText, { usage });
 
     return fullText;
   } else {
-    const fullText = await runStreamTextWithoutResource(options);
-    sendStageFinal(controller, encoder, stageId, fullText);
+    const { fullText, usage } = await runStreamTextWithoutResource(options);
+    sendStageFinal(controller, encoder, stageId, fullText, { usage });
 
     return fullText;
   }
@@ -89,7 +96,12 @@ async function runStreamTextWithoutResource(options: StreamOptions) {
     sendStageDelta(controller, encoder, stageId, fullText);
   }
 
-  return fullText;
+  const usage = await result.usage;
+
+  return {
+    fullText,
+    usage
+  };
 }
 
 /**
@@ -99,19 +111,20 @@ export async function runStreamObject(options: StreamObjectOptions) {
   const { systemPrompt, messages, schema, controller, encoder, stageId, resources } = options;
 
   const finalMessages = [...messages];
+  const childrenUsages: StageUsage[] = [];
 
   sendStageStart(controller, encoder, stageId);
 
   if (resources) {
     let accumulatedMarkdown = "";
-    const result = await runStreamResources({
+    const resourceResult = await runStreamResources({
       resources,
       systemPrompt,
       messages,
       onDelta: deltaResource => {
         const markdown = buildSingleResourcePrompt(deltaResource);
         accumulatedMarkdown += markdown;
-        // TODO
+        // TODO 这里如何处理?
         // sendStageDelta(controller, encoder, stageId, accumulatedMarkdown);
       },
       onError: error => {
@@ -120,7 +133,10 @@ export async function runStreamObject(options: StreamObjectOptions) {
       },
     });
     
-    const resourcesMarkdown = buildFullResourcePrompt(result.analysis, result.resources);
+    // 收集 runStreamResources 的 usage
+    childrenUsages.push(resourceResult.usage);
+    
+    const resourcesMarkdown = buildFullResourcePrompt(resourceResult.analysis, resourceResult.resources);
 
     // 将资源选择结果作为 user message 传递给下游
     finalMessages.push({
@@ -149,7 +165,15 @@ export async function runStreamObject(options: StreamObjectOptions) {
     sendStageDelta(controller, encoder, stageId, finalObject);
   }
 
-  sendStageFinal(controller, encoder, stageId, finalObject as Record<string, unknown>);
+  const mainUsage = await result.usage;
+  
+  // 构建完整的 usage
+  const usage: StageUsage = {
+    ...mainUsage,
+    childrenUsages: childrenUsages.length > 0 ? childrenUsages : undefined,
+  };
+
+  sendStageFinal(controller, encoder, stageId, finalObject as Record<string, unknown>, { usage });
 
   return finalObject as Record<string, unknown>;
 }
@@ -165,6 +189,7 @@ type StreamResourcesOption = Pick<StreamOptions, "resources" | "systemPrompt" | 
 async function runStreamResources(options: StreamResourcesOption): Promise<{
   analysis: string;
   resources: Array<{ name: string; description: string; api: string }>;
+  usage: StageUsage;
 }> {
   const { systemPrompt, messages, resources, onError, onDelta } = options;
 
@@ -250,9 +275,12 @@ async function runStreamResources(options: StreamResourcesOption): Promise<{
     }
   }
 
+  const usage = await result.usage;
+
   // 返回完整的结构化对象
   return {
     analysis,
     resources: fullResources,
+    usage,
   };
 }

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CodeEditor } from "@/components/biz/CodeEditor";
 import { PreviewPanel } from "./PreviewPanel";
 import { EditorSidebar } from "./EditorSidebar";
+import { UsagePanel } from "./UsagePanel";
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { usePipelineStage, useStageUpdate } from "@/lib/store/pipeline/hooks";
 import type { GeneratedFileName, GenerateCodeOutput } from "@/lib/store/pipeline/types";
@@ -138,8 +139,11 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({ onError, onUnsaveCha
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
     >
       {/* Header */}
-      <header className="col-span-full bg-[#111216] border-b border-[#23252b] flex items-center px-5 font-bold tracking-wide">
-        AI Compoder<span className="text-[#ffbe0b]">.IDE</span>
+      <header className="col-span-full bg-[#111216] border-b border-[#23252b] flex items-center justify-between px-5">
+        <span className="font-bold tracking-wide">
+          AI Compoder<span className="text-[#ffbe0b]">.IDE</span>
+        </span>
+        {useMemo(() => <UsagePanel />, [])}
       </header>
 
       {/* Sidebar */}

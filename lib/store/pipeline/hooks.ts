@@ -4,7 +4,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { pipelineStateAtomFamily, pipelineStagesAtomFamily } from "./atoms";
 import { consumeSSE } from "./utils/sse";
-import { StageState, PipelineState, SSECallbacks, PipelineId, StageOutput } from "./types";
+import { StageState, PipelineState, SSECallbacks, PipelineId, StageOutput, StageUsage } from "./types";
 import { ModelMessage } from "ai";
 import { mergeData } from "./utils/mergeData";
 import { buildMessageContext } from "./utils/messageFactory";
@@ -24,15 +24,28 @@ export function usePipelineStateAction<P extends PipelineId>(pipelineId: P) {
         isRunning: true,
         error: undefined,
         previousUserInput: userInput,
+        usages: {}, // 重置 usages
       }));
     },
     /** pipeline 正常结束 */
-    finish(finalOutput: PipelineState<P>["finalOutput"]) {
-      setPipelineState(prev => ({
-        ...prev,
-        isRunning: false,
-        finalOutput,
-      } as PipelineState));
+    finish(
+      finalOutput: PipelineState<P>["finalOutput"],
+      stageId?: string,
+      stageUsage?: StageUsage
+    ) {
+      setPipelineState(prev => {
+        const updates: Record<string, unknown> = {
+          isRunning: false,
+          finalOutput,
+        };
+        if (stageId && stageUsage) {
+          updates.usages = {
+            ...prev.usages,
+            [stageId]: stageUsage,
+          };
+        }
+        return { ...prev, ...updates };
+      });
     },
     /** pipeline 出错 */
     fail(error: PipelineState<P>["error"]) {
@@ -48,6 +61,7 @@ export function usePipelineStateAction<P extends PipelineId>(pipelineId: P) {
         isRunning: false,
         error: undefined,
         currentStage: undefined,
+        usages: {},
       });
     },
     /** 更新 currentStage */
@@ -233,7 +247,12 @@ export function usePipeline<T extends PipelineId>(pipelineId: T) {
                 type: "finish",
               },
             });
-            pipelineActions.finish(mergedFinal as PipelineState<T>["finalOutput"]);
+
+            pipelineActions.finish(
+              mergedFinal as PipelineState<T>["finalOutput"],
+              data.id,
+              data.meta?.usage
+            );
             callbacks?.onFinal?.(data);
           },
           onError: data => {

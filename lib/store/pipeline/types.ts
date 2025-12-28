@@ -3,6 +3,19 @@
  * 前后端共享的 Pipeline 和 Schema 类型定义
  */
 
+import { LanguageModelUsage } from "ai";
+
+// ============================================
+// Usage Types
+// ============================================
+
+/**
+ * 扩展 Usage 类型，支持嵌套子调用
+ */
+export interface StageUsage extends LanguageModelUsage {
+  childrenUsages?: LanguageModelUsage[];
+}
+
 // ============================================
 // Pipeline 注册表 - 统一管理所有 Pipeline 的输出类型
 // ============================================
@@ -71,6 +84,7 @@ export interface PipelineState<P extends PipelineId = PipelineId> {
   error?: string;
   finalOutput?: PipelineFinalOutput<P>;
   previousUserInput?: string;
+  usages?: Record<string, StageUsage>;
 }
 
 export interface StageState<P extends PipelineId = PipelineId, S extends string = string> {
@@ -98,6 +112,7 @@ export interface SSEStageDeltaData<S = unknown> {
 export interface SSEStageFinalData<F = unknown> {
   id: string;
   final: F;
+  meta?: { usage?: StageUsage };
 }
 
 export interface SSEStageErrorData {
