@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
-import { jsonSchemaToZod } from './jsonSchemaToZod';
+import { jsonSchemaToZod } from '../jsonSchemaToZod';
 
 describe('jsonSchemaToZod', () => {
   it('should convert string schema', () => {

@@ -16,7 +16,7 @@ export const EditorTerminalOutput: React.FC<EditorTerminalOutputProps> = ({
   isCollapsed = false,
   onToggleCollapse,
 }) => {
-  const { snapshot, final, status, error } = usePipelineStage("business-code-generate", "stage-1");
+  const { snapshot, final, status, error } = usePipelineStage("business-code-generate", "design-code");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -54,7 +54,7 @@ export const EditorTerminalOutput: React.FC<EditorTerminalOutputProps> = ({
   return (
     <div
       ref={scrollContainerRef}
-      className="w-full bg-gray-900/90 backdrop-blur-md border border-gray-800/50 rounded-t-2xl border-b-0 font-mono text-sm transition-all duration-300 ease-in-out overflow-y-auto scrollbar-hide"
+      className="w-full bg-gray-900/90 backdrop-blur-md border border-gray-800/50 rounded-t-2xl border-b-0 font-mono text-sm transition-all duration-600 ease-in-out overflow-y-auto scrollbar-hide"
       style={{
         minHeight: isCollapsed ? "56px" : "120px",
         maxHeight: isCollapsed ? "56px" : "400px",

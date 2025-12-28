@@ -7,6 +7,7 @@ import { consumeSSE } from "./utils/sse";
 import { StageState, PipelineState, SSECallbacks, PipelineId, StageOutput } from "./types";
 import { ModelMessage } from "ai";
 import { mergeData } from "./utils/mergeData";
+import { buildMessageContext } from "./utils/messageFactory";
 
 export function usePipelineState<P extends PipelineId>(pipelineId: P): PipelineState<P> {
   return useAtomValue(pipelineStateAtomFamily(pipelineId)) as unknown as PipelineState<P>;
@@ -181,14 +182,9 @@ export function usePipeline<T extends PipelineId>(pipelineId: T) {
     const messages: ModelMessage[] = [];
     const { previousUserInput, finalOutput } = pipelineState || {};
 
-    // 如果有上一轮对话上下文，插入历史记录
-    if (previousUserInput && finalOutput) {
-      messages.push({ role: "user", content: previousUserInput });
-      // 将 finalOutput 序列化为字符串（如果是对象）
-      const assistantContent =
-        typeof finalOutput === "string" ? finalOutput : JSON.stringify(finalOutput, null, 2);
-      messages.push({ role: "assistant", content: assistantContent });
-    }
+    // 获取各 pipeline 的消息上下文
+    const contextMessages = buildMessageContext(pipelineId, previousUserInput, finalOutput);
+    messages.push(...contextMessages);
 
     // 始终添加当前用户输入
     messages.push({ role: "user", content: input });

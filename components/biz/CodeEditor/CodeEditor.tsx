@@ -7,12 +7,14 @@ import { getLanguageFromFilename } from "@/components/biz/CodeEditor/utils";
 import { Editor, OnMount, BeforeMount } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 
+const DEFAULT_PLACEHOLDER = '// Start coding...'
+
 export const CodeEditor: React.FC<CodeEditorProps> = ({
   className,
   code = "",
   language,
   filename,
-  placeholder = "// Start coding...",
+  placeholder = DEFAULT_PLACEHOLDER,
   readOnly = false,
   onChange,
 }) => {
@@ -23,7 +25,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
 
   // 处理编辑器内容变化
   const handleEditorChange = (value: string | undefined) => {
-    if (readOnly || !value) return;
+    if (readOnly || !value || value === DEFAULT_PLACEHOLDER) return;
     onChange?.(value);
   };
 
@@ -74,7 +76,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
 
       <Editor
         height="100%"
-        path={filename || "index.ts"}
+        path={filename || "index.js"}
         language={detectedLanguage}
         value={code || placeholder}
         theme="vs-dark"

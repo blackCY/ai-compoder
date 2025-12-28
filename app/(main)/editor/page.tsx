@@ -29,7 +29,7 @@ export default function EditorPage() {
       />
 
       {/* Floating Dock */}
-      <EditorFloatingDock ref={dockRef} disabled={disabled} />
+      <EditorFloatingDock ref={dockRef} disabled={disabled} placeholder={disabled ? '保存代码后即可输入' : undefined} />
     </div>
   );
 }

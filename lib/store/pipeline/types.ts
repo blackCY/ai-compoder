@@ -8,7 +8,7 @@
 // ============================================
 
 /**
- * 文件名类型 - stage-2 生成的文件
+ * 文件名类型 - generate-code 生成的文件
  */
 export type GeneratedFileName = "App.tsx" | "Component.tsx" | "styles.css" | "utils.ts";
 
@@ -26,14 +26,14 @@ export interface GeneratedFileContent {
  * 通过 declaration merging 扩展注册新的 pipeline 类型
  */
 /**
- * Stage-2 输出类型 - 直接是文件 Map，无 files 包装层
+ * generate-code 输出类型 - 直接是文件 Map，无 files 包装层
  */
-export type Stage2Output = Partial<Record<GeneratedFileName, GeneratedFileContent>>;
+export type GenerateCodeOutput = Partial<Record<GeneratedFileName, GeneratedFileContent>>;
 
 export interface PipelineRegistry {
   "business-code-generate": {
-    "stage-1": string; // Design Phase - 分析需求和选择组件
-    "stage-2": Stage2Output; // Coding Phase - 生成代码文件
+    "design-code": string; // Design Phase - 分析需求和选择组件
+    "generate-code": GenerateCodeOutput; // Coding Phase - 生成代码文件
   };
 }
 

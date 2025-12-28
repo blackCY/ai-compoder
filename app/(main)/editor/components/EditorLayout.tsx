@@ -4,15 +4,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CodeEditor } from "@/components/biz/CodeEditor";
 import { PreviewPanel } from "./PreviewPanel";
 import { EditorSidebar } from "./EditorSidebar";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { usePipelineStage, useStageUpdate } from "@/lib/store/pipeline/hooks";
-import type { GeneratedFileName, Stage2Output } from "@/lib/store/pipeline/types";
+import type { GeneratedFileName, GenerateCodeOutput } from "@/lib/store/pipeline/types";
 import type { FileMap } from "react-renderer";
+import { toast } from "sonner";
 
 /**
- * 将 Stage2Output 转换为 FileMap
+ * 将 GenerateCodeOutput 转换为 FileMap
  */
-function toFileMap(output: Stage2Output | undefined): FileMap | undefined {
+function toFileMap(output: GenerateCodeOutput | undefined): FileMap | undefined {
   if (!output) return undefined;
 
   const fileMap: FileMap = {};
@@ -33,19 +34,19 @@ export interface EditorLayoutProps {
 
 export const EditorLayout: React.FC<EditorLayoutProps> = ({ onError, onUnsaveChange }) => {
   const [selectedFileName, setSelectedFileName] = useState<GeneratedFileName | null>(null);
-  const { final, snapshot, status } = usePipelineStage("business-code-generate", "stage-2");
+  const { final, snapshot, status } = usePipelineStage("business-code-generate", "generate-code");
 
   // 使用 useStageUpdate hook
-  const { updateStage } = useStageUpdate("business-code-generate", "stage-2", true);
+  const { updateStage } = useStageUpdate("business-code-generate", "generate-code", true);
 
   // 编辑后的文件内容（一开始为空，changed 时存入）
-  const [editedFiles, setEditedFiles] = useState<Stage2Output>({});
+  const [editedFiles, setEditedFiles] = useState<GenerateCodeOutput>({});
   // 是否有未保存更改
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const filesMap = snapshot || {};
 
-  // 判断 stage-2 是否正在运行
+  // 判断 generate-code 是否正在运行
   const isStageRunning = status === "running";
 
   // 是否显示预览面板
@@ -86,9 +87,20 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({ onError, onUnsaveCha
     onUnsaveChange?.(isSave)
   }
 
+  // 处理 auto fix 前的拦截
+  const handleAutoFix = useCallback((error: Error) => {
+    if (hasUnsavedChanges) {
+      toast.warning("请先保存更改后再进行自动修复", {
+        position: "top-center",
+      });
+      return;
+    }
+    onError?.(error);
+  }, [hasUnsavedChanges, onError]);
+
   // 处理代码变化
   const handleCodeChange = (newCode: string) => {
-    if (!selectedFileName || !final) return;
+    if (!selectedFileName || !final || isStageRunning) return;
 
     setEditedFiles(prev => ({
       ...prev,
@@ -105,7 +117,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({ onError, onUnsaveCha
     if (!hasUnsavedChanges || !final) return;
 
     // 合并 final 和 editedFiles
-    const mergedFiles: Stage2Output = {
+    const mergedFiles: GenerateCodeOutput = {
       ...final,
       ...editedFiles,
     };
@@ -149,26 +161,31 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({ onError, onUnsaveCha
       />
 
       {/* Preview with slide-in animation */}
-      <AnimatePresence>
-        {showPreview && (
-          <motion.div
-            initial={{ width: 0, opacity: 0 }}
-            animate={{ width: "100%", opacity: 1 }}
-            exit={{ width: 0, opacity: 0 }}
-            transition={{
-              duration: 0.5,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-          >
-            <PreviewPanel
-              fileMap={previewFileMap}
-              entryFile="App.tsx"
-              className="h-full"
-              onAutoFix={onError}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {useMemo(
+        () => (
+          <AnimatePresence>
+            {showPreview && (
+              <motion.div
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: "100%", opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                transition={{
+                  duration: 0.5,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+              >
+                <PreviewPanel
+                  fileMap={previewFileMap}
+                  entryFile="App.tsx"
+                  className="h-full"
+                  onAutoFix={handleAutoFix}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        ),
+        [showPreview, previewFileMap, handleAutoFix]
+      )}
     </motion.div>
   );
 };

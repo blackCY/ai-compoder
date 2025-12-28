@@ -3,7 +3,11 @@ import { getModel, getModelWithStructure } from "../getModel";
 import { jsonSchemaToZod } from "./utils/jsonSchemaToZod";
 import { sendStageDelta, sendStageError, sendStageFinal, sendStageStart } from "./sse";
 import { Resource } from "./types";
-import { buildSystemPrompt } from "./utils/resourceUtils";
+import {
+  buildSystemPrompt,
+  buildSingleResourcePrompt,
+  buildFullResourcePrompt,
+} from "./utils/resourceUtils";
 import { JsonSchema } from "json-schema-to-zod";
 
 // ============================================
@@ -36,12 +40,15 @@ export async function runStreamText(options: StreamOptions): Promise<string> {
   sendStageStart(controller, encoder, stageId);
 
   if (resources) {
-    const finalResult = await runStreamResources({
+    let accumulatedMarkdown = "";
+    const result = await runStreamResources({
       resources,
       systemPrompt,
       messages,
-      onDelta: deltaObj => {
-        sendStageDelta(controller, encoder, stageId, JSON.stringify(deltaObj));
+      onDelta: deltaResource => {
+        const markdown = buildSingleResourcePrompt(deltaResource);
+        accumulatedMarkdown += markdown;
+        sendStageDelta(controller, encoder, stageId, accumulatedMarkdown);
       },
       onError: error => {
         sendStageError(controller, encoder, stageId, error);
@@ -49,7 +56,7 @@ export async function runStreamText(options: StreamOptions): Promise<string> {
       },
     });
 
-    const fullText = JSON.stringify(finalResult);
+    const fullText = buildFullResourcePrompt(result.analysis, result.resources);
     sendStageFinal(controller, encoder, stageId, fullText);
 
     return fullText;
@@ -82,9 +89,6 @@ async function runStreamTextWithoutResource(options: StreamOptions) {
     sendStageDelta(controller, encoder, stageId, fullText);
   }
 
-  const usage = await result.usage;
-  console.log(usage, "runStreamText--" + stageId);
-
   return fullText;
 }
 
@@ -99,22 +103,29 @@ export async function runStreamObject(options: StreamObjectOptions) {
   sendStageStart(controller, encoder, stageId);
 
   if (resources) {
-    const assistantMessage = await runStreamResources({
+    let accumulatedMarkdown = "";
+    const result = await runStreamResources({
       resources,
       systemPrompt,
       messages,
-      onDelta: deltaObj => {
-        sendStageDelta(controller, encoder, stageId, JSON.stringify(deltaObj));
+      onDelta: deltaResource => {
+        const markdown = buildSingleResourcePrompt(deltaResource);
+        accumulatedMarkdown += markdown;
+        // TODO
+        // sendStageDelta(controller, encoder, stageId, accumulatedMarkdown);
       },
       onError: error => {
         sendStageError(controller, encoder, stageId, error);
         throw error;
       },
     });
+    
+    const resourcesMarkdown = buildFullResourcePrompt(result.analysis, result.resources);
 
+    // 将资源选择结果作为 user message 传递给下游
     finalMessages.push({
-      role: "assistant",
-      content: JSON.stringify(assistantMessage),
+      role: "user",
+      content: `<user-requirements>\n${resourcesMarkdown}\n</user-requirements>`,
     });
   }
 
@@ -138,26 +149,23 @@ export async function runStreamObject(options: StreamObjectOptions) {
     sendStageDelta(controller, encoder, stageId, finalObject);
   }
 
-  const usage = await result.usage;
-  console.log(usage, "runStreamObject--" + stageId);
-
   sendStageFinal(controller, encoder, stageId, finalObject as Record<string, unknown>);
-
-  console.log(finalObject, 'finalObject')
 
   return finalObject as Record<string, unknown>;
 }
 
 type StreamResourcesOption = Pick<StreamOptions, "resources" | "systemPrompt" | "messages"> & {
   onError?: (error: Error | unknown) => void;
-  onDelta?: (delta: unknown) => void;
+  onDelta?: (resource: any) => void;
 };
 
 /**
- * 执行资源分析并返回完整的资源信息
- * @returns assistant message 对象，包含完整的资源信息
+ * 执行资源分析并返回资源信息对象
  */
-async function runStreamResources(options: StreamResourcesOption) {
+async function runStreamResources(options: StreamResourcesOption): Promise<{
+  analysis: string;
+  resources: Array<{ name: string; description: string; api: string }>;
+}> {
   const { systemPrompt, messages, resources, onError, onDelta } = options;
 
   // 构建包含资源的完整 System Prompt
@@ -176,18 +184,14 @@ async function runStreamResources(options: StreamResourcesOption) {
         items: {
           type: "object",
           properties: {
-            key: {
+            name: {
               type: "string",
               description: "The resource key from available resources",
             },
-            reason: {
-              type: "string",
-              description: "Why this resource is needed for the current task",
-            },
           },
-          required: ["key", "reason"],
+          required: ["name"],
         },
-        description: "List of selected resources with reasons",
+        description: "List of selected resources",
       },
     },
     required: ["analysis", "selectedResources"],
@@ -206,41 +210,49 @@ async function runStreamResources(options: StreamResourcesOption) {
     },
   });
 
-  let finalObject: {
-    analysis: string;
-    selectedResources: Array<{ [key in "key" | "description" | "api" | "reason"]: string }>;
-  } = { analysis: "", selectedResources: [] };
+  let analysis = "";
+  // 增量构建资源列表
+  let lastProcessedCount = 0;
+  const fullResources: Array<{ name: string; description: string; api: string }> = [];
 
   for await (const partialObject of result.partialObjectStream) {
-    finalObject = partialObject as typeof finalObject;
-    onDelta?.(finalObject);
-  }
+    const { analysis: currentAnalysis, selectedResources } = partialObject as {
+      analysis?: string;
+      selectedResources?: Array<{ name: string }>;
+    };
 
-  const usage = await result.usage;
-  console.log(usage, finalObject.selectedResources, "用到了哪些组件");
-
-  // 根据选择的 keys 构建完整的资源对象
-  const fullResources = finalObject.selectedResources.reduce((acc, { key, reason }) => {
-    const resource = resources![key];
-    if (!resource) {
-      console.warn(`Resource key "${key}" not found in available resources`);
-      return acc;
+    // 更新 analysis
+    if (currentAnalysis) {
+      analysis = currentAnalysis;
     }
 
-    acc.push({
-      key,
-      description: resource.description,
-      api: resource.api,
-      reason,
-    });
-    return acc;
-  }, [] as (typeof finalObject)["selectedResources"]);
+    const currentResources = selectedResources || [];
 
-  // 构建最终的结构化对象
-  const finalResult = {
-    analysis: finalObject.analysis,
+    // 只处理新增的、完整的资源
+    for (let i = lastProcessedCount; i < currentResources.length; i++) {
+      const { name } = currentResources[i];
+      if (!name) continue; // 跳过不完整的资源
+
+      const resource = resources![name];
+
+      if (resource) {
+        const fullResource = {
+          name,
+          description: resource.description,
+          api: resource.api,
+        };
+        fullResources.push(fullResource);
+        lastProcessedCount = i + 1;
+
+        // 发送单个资源对象增量
+        onDelta?.(fullResource);
+      }
+    }
+  }
+
+  // 返回完整的结构化对象
+  return {
+    analysis,
     resources: fullResources,
   };
-
-  return finalResult;
 }

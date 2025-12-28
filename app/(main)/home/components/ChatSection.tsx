@@ -17,7 +17,7 @@ export const ChatSection = () => {
     setShowTerminal(true);
     await run(input, {
       onFinal: data => {
-        if (data.id === "stage-1") {
+        if (data.id === "design-code") {
           toast.success("完成组件设计，即将开始生成组件...", {
             position: "top-center",
           });

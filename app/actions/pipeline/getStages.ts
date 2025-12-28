@@ -14,6 +14,7 @@ const mockResources: Resource = require("./config/private-component.json");
 const testStages: StageConfig[] = [
   // Stage 1: Design Phase - Requirement Analysis & Component Planning
   {
+    stageId: 'design-code',
     resources: mockResources,
     systemPrompt: `You are a Senior Product Analyst and Technical Architect.
 
@@ -48,13 +49,11 @@ SELECTION CRITERIA:
 OUTPUT REQUIREMENTS:
 - Be specific about which components are needed and why
 - Use exact component names from the available resources
-- Provide clear reasoning for each selection
-
-Remember: Your analysis and component selection will guide the Senior Frontend Engineer in the next stage. Be thorough, precise, and practical.
 `,
   },
   // Stage 2: Coding Phase
   {
+    stageId: 'generate-code',
     systemPrompt: `You are a Senior Frontend Engineer.
 
   Your goal is to generate executable React code using the components selected from the private component library in the previous stage.

@@ -17,6 +17,7 @@ export type Resource = Record<
  * 用户配置的阶段定义（纯数据）
  */
 export interface StageConfig {
+  stageId: string;
   systemPrompt: string; // 系统提示词
   schema?: JsonSchema; // 可选，JSON Schema 对象
   resources?: Resource; // 可选，私有资源

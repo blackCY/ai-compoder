@@ -10,7 +10,7 @@ interface HomeTerminalOutputProps {
 }
 
 export const HomeTerminalOutput: React.FC<HomeTerminalOutputProps> = ({ isVisible }) => {
-  const stage = usePipelineStage("business-code-generate", "stage-1");
+  const stage = usePipelineStage("business-code-generate", "design-code");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 

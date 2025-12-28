@@ -120,35 +120,38 @@ export const CodeRenderer: FC<CodeRendererProps> = ({
   }, [code, fileMap, entryFile, dependencies]);
 
   // 渲染内容（组件或错误）
-  const content = useMemo(() => (
-    <>
-      {enableFullscreen && (
-        <div className="absolute top-2 right-2 z-10">
-          <FullscreenButton isFullscreen={isFullscreen} onClick={toggleFullscreen} />
-        </div>
-      )}
-      {error ? (
-        <div
-          className={cn(
-            "react-renderer-error",
-            "p-4 bg-red-500/10 border border-red-500/30 rounded-lg",
-            "text-red-400 text-sm font-mono"
-          )}
-        >
-          <div className="font-semibold mb-2">Compilation Error</div>
-          <pre className="whitespace-pre-wrap select-text">
-            {typeof error.message === "string"
-              ? error.message
-              : String(error.message || "Unknown error")}
-          </pre>
-        </div>
-      ) : (
-        <ErrorBoundary className="h-full" onError={onError} renderError={renderError}>
-          <Component />
-        </ErrorBoundary>
-      )}
-    </>
-  ), [error, isFullscreen, toggleFullscreen, enableFullscreen, onError, renderError, Component]);
+  const content = useMemo(
+    () => (
+      <>
+        {enableFullscreen && (
+          <div className="absolute top-2 right-2 z-10">
+            <FullscreenButton isFullscreen={isFullscreen} onClick={toggleFullscreen} />
+          </div>
+        )}
+        {error ? (
+          <div
+            className={cn(
+              "react-renderer-error",
+              "p-4 bg-red-500/10 border border-red-500/30 rounded-lg",
+              "text-red-400 text-sm font-mono"
+            )}
+          >
+            <div className="font-semibold mb-2">Compilation Error</div>
+            <pre className="whitespace-pre-wrap select-text">
+              {typeof error.message === "string"
+                ? error.message
+                : String(error.message || "Unknown error")}
+            </pre>
+          </div>
+        ) : (
+          <ErrorBoundary className="h-full" onError={onError} renderError={renderError}>
+            <Component />
+          </ErrorBoundary>
+        )}
+      </>
+    ),
+    [error, isFullscreen, toggleFullscreen, enableFullscreen, onError, renderError, Component]
+  );
 
   // 始终使用 Portal 渲染到 body，通过样式控制全屏/非全屏
   // 这样组件不会卸载/重新挂载，保持状态

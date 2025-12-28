@@ -51,7 +51,7 @@ export async function consumeSSE(
   // Flush remaining buffer
   // This is normal if the stream didn't end with \n\n or if there was a final incomplete chunk
   if (buffer.trim()) {
-    processSSEBlock(buffer, callbacks);
+    processSSEBlock(buffer.trim(), callbacks);
   }
 }
 
