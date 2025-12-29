@@ -14,10 +14,10 @@ function formatNumber(num: number | undefined): string {
   return `${(num / 1000).toFixed(2)}k`;
 }
 
-export function UsagePanel({ pipelineId }: { pipelineId: PipelineId }) {
+export function UsagePanel({ pipelineName }: { pipelineName: PipelineId }) {
   const [isOpen, setIsOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
-  const { usages = {}, isRunning } = usePipelineState(pipelineId);
+  const { usages = {}, isRunning } = usePipelineState(pipelineName);
 
   const total = useMemo(() => {
     return Object.values(usages).reduce(

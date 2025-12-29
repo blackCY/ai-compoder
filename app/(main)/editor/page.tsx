@@ -1,17 +1,17 @@
 "use client";
-
-import { useSearchParams } from "next/navigation";
-
-import { useRef, useState } from "react";
+import { use, useRef, useState } from "react";
 import { EditorLayout, EditorFloatingDock } from "./components";
 import type { EditorFloatingDockRef } from "./components";
 import type { PipelineId } from "@/lib/store/pipeline/types";
 
-export default function EditorPage() {
+interface PageProps {
+  searchParams: Promise<{ name?: PipelineId; id: string }>;
+}
+
+export default function EditorPage({ searchParams }: PageProps) {
   const dockRef = useRef<EditorFloatingDockRef>(null);
   const [disabled, setDisabled] = useState(false);
-  const searchParams = useSearchParams();
-  const pipelineId = searchParams.get("pipeline") as PipelineId;
+  const { name, id } = use(searchParams);
 
   return (
     <div
@@ -22,7 +22,7 @@ export default function EditorPage() {
     >
       {/* Main Layout Grid */}
       <EditorLayout
-        pipelineId={pipelineId}
+        pipelineName={name!}
         onError={(error: Error) => {
           dockRef.current
             ?.generate(`之前的需求已经生成了代码，但运行时出现错误。请修复以下错误并重新生成可用的代码。
@@ -38,7 +38,8 @@ export default function EditorPage() {
       <EditorFloatingDock
         ref={dockRef}
         disabled={disabled}
-        pipelineId={pipelineId}
+        pipelineName={name!}
+        pipelineId={id}
         placeholder={disabled ? "保存代码后即可输入" : undefined}
       />
     </div>

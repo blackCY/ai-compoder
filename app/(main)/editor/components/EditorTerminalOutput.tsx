@@ -10,16 +10,16 @@ interface EditorTerminalOutputProps {
   isVisible: boolean;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
-  pipelineId: PipelineId;
+  pipelineName: PipelineId;
 }
 
 export const EditorTerminalOutput: React.FC<EditorTerminalOutputProps> = ({
   isVisible,
   isCollapsed = false,
   onToggleCollapse,
-  pipelineId,
+  pipelineName,
 }) => {
-  const { snapshot, final, status, error } = usePipelineStage(pipelineId, "design-code");
+  const { snapshot, final, status, error } = usePipelineStage(pipelineName, "design-code");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 

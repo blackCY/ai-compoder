@@ -5,7 +5,7 @@ import { StageConfig } from "./types";
 
 /**
  * Fetch pipeline stages from database with fallback
- * @param typeId - Pipeline template identifier (currently unused, for future multi-template support)
+ * @param pipelineId - Pipeline template identifier (currently unused, for future multi-template support)
  * @returns Array of stage configurations
  */
 export const getStages = async (pipelineId: string): Promise<StageConfig[]> => {

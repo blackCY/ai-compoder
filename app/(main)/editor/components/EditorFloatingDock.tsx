@@ -11,15 +11,16 @@ export interface EditorFloatingDockRef {
 }
 
 export interface EditorFloatingDockProps {
-  pipelineId: PipelineId;
+  pipelineName: PipelineId;
+  pipelineId: string;
   disabled?: boolean;
   placeholder?: string;
 }
 
 export const EditorFloatingDock = forwardRef<EditorFloatingDockRef, EditorFloatingDockProps>(
-  ({ pipelineId, disabled = false, placeholder = "创建一个响应式的用户配置文件卡片组件" }, ref) => {
-    const { run } = usePipeline(pipelineId);
-    const { isRunning } = usePipelineState(pipelineId);
+  ({ pipelineId, pipelineName, disabled = false, placeholder = "创建一个响应式的用户配置文件卡片组件" }, ref) => {
+    const { run } = usePipeline(pipelineName, pipelineId);
+    const { isRunning } = usePipelineState(pipelineName);
     const [showTerminal, setShowTerminal] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -51,7 +52,7 @@ export const EditorFloatingDock = forwardRef<EditorFloatingDockRef, EditorFloati
             isVisible={showTerminal}
             isCollapsed={isCollapsed}
             onToggleCollapse={handleToggleCollapse}
-            pipelineId={pipelineId}
+            pipelineName={pipelineName}
           />
         }
         disabled={isRunning || disabled}

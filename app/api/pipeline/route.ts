@@ -2,8 +2,8 @@ import { getStages } from "@/app/actions/pipeline/getStages";
 import { runPipeline } from "@/app/actions/pipeline/runner";
 
 export async function POST(req: Request) {
-  const { messages, typeId = "default" } = await req.json();
-  const stages = await getStages(typeId);
+  const { messages, pipelineId } = await req.json();
+  const stages = await getStages(pipelineId);
 
   const stream = new ReadableStream({
     async start(controller) {

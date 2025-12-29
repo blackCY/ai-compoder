@@ -182,11 +182,12 @@ export function useStageUpdate<P extends PipelineId, S extends string>(
  * 支持类型安全的 pipeline 类型推断
  *
  * @param pipelineId - Pipeline ID
+ * @param pipelineName - Pipeline Name
  */
-export function usePipeline<T extends PipelineId>(pipelineId: T) {
-  const pipelineState = usePipelineState(pipelineId);
-  const pipelineActions = usePipelineStateAction(pipelineId);
-  const { dispatch: stageDispatcher, getStageState } = usePipelineStageActions(pipelineId);
+export function usePipeline<T extends PipelineId>(pipelineName: T, pipelineId: string) {
+  const pipelineState = usePipelineState(pipelineName);
+  const pipelineActions = usePipelineStateAction(pipelineName);
+  const { dispatch: stageDispatcher, getStageState } = usePipelineStageActions(pipelineName);
 
   const run = async (input: string, callbacks?: SSECallbacks) => {
     // 防止重复运行
@@ -197,7 +198,7 @@ export function usePipeline<T extends PipelineId>(pipelineId: T) {
     const { previousUserInput, finalOutput } = pipelineState || {};
 
     // 获取各 pipeline 的消息上下文
-    const contextMessages = buildMessageContext(pipelineId, previousUserInput, finalOutput);
+    const contextMessages = buildMessageContext(pipelineName, previousUserInput, finalOutput);
     messages.push(...contextMessages);
 
     // 始终添加当前用户输入
