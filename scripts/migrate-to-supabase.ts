@@ -196,7 +196,6 @@ async function migrate() {
     .from("pipeline_stages")
     .insert({
       stage_id: "design-code",
-      order_index: 1,
       system_prompt: designPrompt,
       schema: null,
     })
@@ -240,7 +239,6 @@ async function migrate() {
     .from("pipeline_stages")
     .insert({
       stage_id: "generate-code",
-      order_index: 2,
       system_prompt: codingPrompt,
       schema: codingSchema,
     })

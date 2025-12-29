@@ -23,30 +23,22 @@ CREATE TABLE IF NOT EXISTS pipeline_stages (
   order_index INTEGER NOT NULL,
   system_prompt TEXT NOT NULL,
   schema JSONB,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- ============================================
--- Stage Resources Junction Table
--- Links stages to their resources (many-to-many)
--- ============================================
-CREATE TABLE IF NOT EXISTS stage_resources (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  stage_id UUID REFERENCES pipeline_stages(id) ON DELETE CASCADE,
-  resource_id UUID REFERENCES resources(id) ON DELETE CASCADE,
-  UNIQUE(stage_id, resource_id)
+  resource_id UUID REFERENCES resources(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT unique_resource UNIQUE (resource_id)
 );
 
 -- ============================================
 -- Indexes for Performance
 -- ============================================
 CREATE INDEX IF NOT EXISTS idx_stages_order ON pipeline_stages(order_index);
+CREATE INDEX IF NOT EXISTS idx_stages_resource ON pipeline_stages(resource_id) WHERE resource_id IS NOT NULL;
 
 -- ============================================
 -- Comments
 -- ============================================
 COMMENT ON TABLE resources IS 'Stores resource data such as component libraries';
 COMMENT ON TABLE pipeline_stages IS 'Stores pipeline stage configurations';
-COMMENT ON TABLE stage_resources IS 'Junction table linking stages to resources';
 COMMENT ON COLUMN resources.data IS 'JSONB data containing resource information';
 COMMENT ON COLUMN pipeline_stages.schema IS 'JSON Schema for structured output validation';
+COMMENT ON COLUMN pipeline_stages.resource_id IS 'Optional reference to a resource (e.g., component library)';

@@ -1,5 +1,6 @@
 "use server";
 
+import { JsonSchema } from "json-schema-to-zod";
 import { StageConfig } from "./types";
 
 /**
@@ -7,18 +8,20 @@ import { StageConfig } from "./types";
  * @param typeId - Pipeline template identifier (currently unused, for future multi-template support)
  * @returns Array of stage configurations
  */
-export const getStages = async (_typeId: string): Promise<StageConfig[]> => {
+export const getStages = async (pipelineId: string): Promise<StageConfig[]> => {
   try {
     // Try to fetch from database first
-    const { fetchAllStages } = await import("@/db/queries");
-    const dbStages = await fetchAllStages();
+    const { fetchStages } = await import("@/db/queries");
+
+    // Use pipelineId directly to fetch stages
+    const dbStages = await fetchStages(pipelineId);
 
     // Transform database rows to StageConfig format
     return dbStages.map((stage) => ({
       stageId: stage.stage_id,
       systemPrompt: stage.system_prompt,
-      schema: stage.schema as any,
-      resources: stage.resources,
+      schema: stage.schema === null ? undefined : (stage.schema as JsonSchema),
+      resources: stage.resources ?? undefined,
     }));
   } catch (error) {
     // Graceful degradation: fall back to hardcoded stages

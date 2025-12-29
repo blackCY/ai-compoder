@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Coins } from "lucide-react";
 import { usePipelineState } from "@/lib/store/pipeline/hooks";
 import { useOnClickOutside } from "@/lib/hooks/useOnClickOutside";
+import { PipelineId } from "@/lib/store/pipeline/types";
 
 /** 格式化数字：超过 1000 显示为 k 单位，保留 2 位小数以提高精度 */
 function formatNumber(num: number | undefined): string {
@@ -13,10 +14,10 @@ function formatNumber(num: number | undefined): string {
   return `${(num / 1000).toFixed(2)}k`;
 }
 
-export function UsagePanel() {
+export function UsagePanel({ pipelineId }: { pipelineId: PipelineId }) {
   const [isOpen, setIsOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
-  const { usages = {}, isRunning } = usePipelineState("business-code-generate");
+  const { usages = {}, isRunning } = usePipelineState(pipelineId);
 
   const total = useMemo(() => {
     return Object.values(usages).reduce(
@@ -61,7 +62,7 @@ export function UsagePanel() {
         </span>
       </motion.button>
 
-        {/* 浮窗 */}
+      {/* 浮窗 */}
       <AnimatePresence>
         {isOpen && (
           <motion.div

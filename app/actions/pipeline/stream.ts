@@ -9,6 +9,7 @@ import {
   buildFullResourcePrompt,
 } from "./utils/resourceUtils";
 import { JsonSchema } from "json-schema-to-zod";
+import { isNonEmptyResources } from "./utils/isNonEmptyResources";
 
 // ============================================
 // 流处理函数选项类型
@@ -39,7 +40,7 @@ export async function runStreamText(options: StreamOptions): Promise<string> {
 
   sendStageStart(controller, encoder, stageId);
 
-  if (resources) {
+  if (isNonEmptyResources(resources)) {
     let accumulatedMarkdown = "";
     const result = await runStreamResources({
       resources,
@@ -115,7 +116,7 @@ export async function runStreamObject(options: StreamObjectOptions) {
 
   sendStageStart(controller, encoder, stageId);
 
-  if (resources) {
+  if (isNonEmptyResources(resources)) {
     let accumulatedMarkdown = "";
     const resourceResult = await runStreamResources({
       resources,

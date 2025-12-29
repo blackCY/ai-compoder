@@ -7,7 +7,7 @@ import { EditorSidebar } from "./EditorSidebar";
 import { UsagePanel } from "./UsagePanel";
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { usePipelineStage, useStageUpdate } from "@/lib/store/pipeline/hooks";
-import type { GeneratedFileName, GenerateCodeOutput } from "@/lib/store/pipeline/types";
+import type { GeneratedFileName, GenerateCodeOutput, PipelineId } from "@/lib/store/pipeline/types";
 import type { FileMap } from "react-renderer";
 import { toast } from "sonner";
 
@@ -29,16 +29,17 @@ function toFileMap(output: GenerateCodeOutput | undefined): FileMap | undefined 
 }
 
 export interface EditorLayoutProps {
+  pipelineId: PipelineId;
   onError?: (error: Error) => void;
   onUnsaveChange?: (saveStatus: boolean) => void;
 }
 
-export const EditorLayout: React.FC<EditorLayoutProps> = ({ onError, onUnsaveChange }) => {
+export const EditorLayout: React.FC<EditorLayoutProps> = ({ pipelineId, onError, onUnsaveChange }) => {
   const [selectedFileName, setSelectedFileName] = useState<GeneratedFileName | null>(null);
-  const { final, snapshot, status } = usePipelineStage("business-code-generate", "generate-code");
+  const { final, snapshot, status } = usePipelineStage(pipelineId, "generate-code");
 
   // 使用 useStageUpdate hook
-  const { updateStage } = useStageUpdate("business-code-generate", "generate-code", true);
+  const { updateStage } = useStageUpdate(pipelineId, "generate-code", true);
 
   // 编辑后的文件内容（一开始为空，changed 时存入）
   const [editedFiles, setEditedFiles] = useState<GenerateCodeOutput>({});
@@ -143,7 +144,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({ onError, onUnsaveCha
         <span className="font-bold tracking-wide">
           AI Compoder<span className="text-[#ffbe0b]">.IDE</span>
         </span>
-        {useMemo(() => <UsagePanel />, [])}
+        {useMemo(() => <UsagePanel pipelineId={pipelineId} />, [pipelineId])}
       </header>
 
       {/* Sidebar */}

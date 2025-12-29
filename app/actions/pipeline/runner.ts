@@ -1,5 +1,3 @@
-"use server";
-
 import { ModelMessage } from "ai";
 import { runStreamText, runStreamObject } from "./stream";
 import { PipelineRunParams } from "./types";

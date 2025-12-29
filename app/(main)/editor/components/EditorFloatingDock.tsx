@@ -3,6 +3,7 @@
 import { useState, forwardRef, useImperativeHandle } from "react";
 import { FloatingDock } from "@/components/biz/FloatingDock";
 import { usePipeline, usePipelineState } from "@/lib/store/pipeline";
+import { PipelineId } from "@/lib/store/pipeline/types";
 import { EditorTerminalOutput } from "./EditorTerminalOutput";
 
 export interface EditorFloatingDockRef {
@@ -10,14 +11,15 @@ export interface EditorFloatingDockRef {
 }
 
 export interface EditorFloatingDockProps {
+  pipelineId: PipelineId;
   disabled?: boolean;
   placeholder?: string;
 }
 
 export const EditorFloatingDock = forwardRef<EditorFloatingDockRef, EditorFloatingDockProps>(
-  ({ disabled = false, placeholder = "创建一个响应式的用户配置文件卡片组件" }, ref) => {
-    const { run } = usePipeline("business-code-generate");
-    const { isRunning } = usePipelineState("business-code-generate");
+  ({ pipelineId, disabled = false, placeholder = "创建一个响应式的用户配置文件卡片组件" }, ref) => {
+    const { run } = usePipeline(pipelineId);
+    const { isRunning } = usePipelineState(pipelineId);
     const [showTerminal, setShowTerminal] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -49,6 +51,7 @@ export const EditorFloatingDock = forwardRef<EditorFloatingDockRef, EditorFloati
             isVisible={showTerminal}
             isCollapsed={isCollapsed}
             onToggleCollapse={handleToggleCollapse}
+            pipelineId={pipelineId}
           />
         }
         disabled={isRunning || disabled}

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { PipelineRegistry } from "@/lib/store/pipeline/types";
 
-type StageOutput = PipelineRegistry["business-code-generate"]["design-code"];
+type StageOutput = PipelineRegistry["private-component-codegen"]["design-code"];
 
 interface StageOutputDisplayProps {
   output: StageOutput;

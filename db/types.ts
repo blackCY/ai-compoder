@@ -26,21 +26,22 @@ export interface DbResource {
  */
 export interface DbPipelineStage {
   id: string;
+  pipeline_id: string;
   stage_id: string;
-  order_index: number;
   system_prompt: string;
   schema: JsonSchema | null;
+  resource_id: string | null;
   created_at: string;
 }
 
 /**
- * Stage resources junction table row
- * Links stages to their resources
+ * Pipeline definition
  */
-export interface DbStageResource {
+export interface DbPipeline {
   id: string;
-  stage_id: string; // References pipeline_stages.id
-  resource_id: string; // References resources.id
+  name: string;
+  description: string | null;
+  created_at: string;
 }
 
 // ============================================
@@ -48,19 +49,16 @@ export interface DbStageResource {
 // ============================================
 
 /**
- * Stage with its resources (query result, selected fields only)
- * Result of querying pipeline_stages with stage_resources and resources
+ * Stage with its resource (query result, with resource joined)
+ * Result of querying pipeline_stages with resources
  */
 export interface DbStageWithResources {
   id: string;
   stage_id: string;
-  order_index: number;
   system_prompt: string;
   schema: JsonSchema | null;
-  stage_resources: Array<{
-    resource_id: string;
-    resources: DbResource | null;
-  }>;
+  resource_id: string | null;
+  resources: DbResource | null;
 }
 
 // ============================================
@@ -69,4 +67,3 @@ export interface DbStageWithResources {
 
 export type DbResourceInsert = Omit<DbResource, 'id' | 'created_at'>;
 export type DbPipelineStageInsert = Omit<DbPipelineStage, 'id' | 'created_at'>;
-export type DbStageResourceInsert = Omit<DbStageResource, 'id'>;

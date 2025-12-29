@@ -4,19 +4,22 @@ import { useEffect, useRef } from "react";
 import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { usePipelineStage } from "@/lib/store/pipeline";
 import { StageOutputDisplay } from "./StageOutputDisplay";
+import { PipelineId } from "@/lib/store/pipeline/types";
 
 interface EditorTerminalOutputProps {
   isVisible: boolean;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
+  pipelineId: PipelineId;
 }
 
 export const EditorTerminalOutput: React.FC<EditorTerminalOutputProps> = ({
   isVisible,
   isCollapsed = false,
   onToggleCollapse,
+  pipelineId,
 }) => {
-  const { snapshot, final, status, error } = usePipelineStage("business-code-generate", "design-code");
+  const { snapshot, final, status, error } = usePipelineStage(pipelineId, "design-code");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 

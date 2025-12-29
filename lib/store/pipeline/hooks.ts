@@ -208,7 +208,7 @@ export function usePipeline<T extends PipelineId>(pipelineId: T) {
 
     try {
       await consumeSSE(
-        { messages, typeId: pipelineId },
+        { messages, pipelineId },
         {
           onStart: data => {
             // 当 stage 开始时，更新 pipeline 的当前 stage

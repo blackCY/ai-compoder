@@ -64,7 +64,7 @@ export function buildMessageContext<P extends PipelineId>(
   finalOutput: PipelineFinalOutput<P> | undefined
 ): ModelMessage[] {
   switch (pipelineId) {
-    case "business-code-generate":
+    case "private-component-codegen":
       return buildBusinessCodeGenerateMessageContext(
         previousUserInput,
         finalOutput as GenerateCodeOutput

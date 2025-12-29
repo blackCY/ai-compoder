@@ -28,7 +28,7 @@ export const Navigation = () => {
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-emerald-500 to-cyan-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
             </a>
             <a
-              href="#chat"
+              href="#pipelines"
               className="text-slate-300 hover:text-emerald-400 transition-all duration-300 text-sm font-semibold tracking-wide relative group py-2"
             >
               体验

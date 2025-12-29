@@ -44,7 +44,7 @@ export interface GeneratedFileContent {
 export type GenerateCodeOutput = Partial<Record<GeneratedFileName, GeneratedFileContent>>;
 
 export interface PipelineRegistry {
-  "business-code-generate": {
+  "private-component-codegen": {
     "design-code": string; // Design Phase - 分析需求和选择组件
     "generate-code": GenerateCodeOutput; // Coding Phase - 生成代码文件
   };
