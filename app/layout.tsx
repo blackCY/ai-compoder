@@ -5,6 +5,7 @@ import { ServerStoreQueryProvider } from "@/lib/server-store";
 import { Provider } from "jotai";
 import { Toaster } from "@/components/ui/sonner";
 import { ViewTransitions } from "next-view-transitions";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
             <Provider>{children}</Provider>
           </ServerStoreQueryProvider>
           <Toaster />
+          <SpeedInsights />
         </body>
       </html>
     </ViewTransitions>
