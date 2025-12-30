@@ -10,9 +10,10 @@ import { StageUsage } from "./types";
  * - 成功：正常返回
  * - 流关闭：抛出 StreamClosedError
  */
+const encoder = new TextEncoder();
+
 function enqueue(
   controller: ReadableStreamDefaultController,
-  encoder: TextEncoder,
   data: string
 ): void {
   try {
@@ -27,10 +28,9 @@ function enqueue(
  */
 export function sendStageStart(
   controller: ReadableStreamDefaultController,
-  encoder: TextEncoder,
   stageId: string
 ) {
-  enqueue(controller, encoder, `event: stageStart\ndata: ${JSON.stringify({ id: stageId })}\n\n`);
+  enqueue(controller, `event: stageStart\ndata: ${JSON.stringify({ id: stageId })}\n\n`);
 }
 
 /**
@@ -38,13 +38,11 @@ export function sendStageStart(
  */
 export function sendStageDelta(
   controller: ReadableStreamDefaultController,
-  encoder: TextEncoder,
   stageId: string,
   snapshot: string | Record<string, unknown>
 ) {
   enqueue(
     controller,
-    encoder,
     `event: stageDelta\ndata: ${JSON.stringify({ id: stageId, snapshot })}\n\n`
   );
 }
@@ -54,7 +52,6 @@ export function sendStageDelta(
  */
 export function sendStageFinal(
   controller: ReadableStreamDefaultController,
-  encoder: TextEncoder,
   stageId: string,
   final: string | Record<string, unknown>,
   meta?: { usage?: StageUsage }
@@ -65,7 +62,6 @@ export function sendStageFinal(
   }
   enqueue(
     controller,
-    encoder,
     `event: stageFinal\ndata: ${JSON.stringify(payload)}\n\n`
   );
 }
@@ -75,13 +71,11 @@ export function sendStageFinal(
  */
 export function sendStageError(
   controller: ReadableStreamDefaultController,
-  encoder: TextEncoder,
   stageId: string,
   error: unknown
 ) {
   enqueue(
     controller,
-    encoder,
     `event: stageError\ndata: ${JSON.stringify({
       id: stageId,
       error: error instanceof Error ? error.message : JSON.stringify(error),

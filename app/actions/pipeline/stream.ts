@@ -19,7 +19,6 @@ export interface StreamOptions {
   systemPrompt: string;
   messages: ModelMessage[];
   controller: ReadableStreamDefaultController;
-  encoder: TextEncoder;
   stageId: string;
   resources?: Resource;
 }
@@ -36,9 +35,9 @@ export interface StreamObjectOptions extends StreamOptions {
  * 执行 streamText 并处理流式输出
  */
 export async function runStreamText(options: StreamOptions): Promise<string> {
-  const { systemPrompt, messages, controller, encoder, stageId, resources } = options;
+  const { systemPrompt, messages, controller, stageId, resources } = options;
 
-  sendStageStart(controller, encoder, stageId);
+  sendStageStart(controller, stageId);
 
   if (isNonEmptyResources(resources)) {
     let accumulatedMarkdown = "";
@@ -49,10 +48,10 @@ export async function runStreamText(options: StreamOptions): Promise<string> {
       onDelta: deltaResource => {
         const markdown = buildSingleResourcePrompt(deltaResource);
         accumulatedMarkdown += markdown;
-        sendStageDelta(controller, encoder, stageId, accumulatedMarkdown);
+        sendStageDelta(controller, stageId, accumulatedMarkdown);
       },
       onError: error => {
-        sendStageError(controller, encoder, stageId, error);
+        sendStageError(controller, stageId, error);
         throw error;
       },
     });
@@ -65,19 +64,19 @@ export async function runStreamText(options: StreamOptions): Promise<string> {
       childrenUsages: [result.usage],
     };
     
-    sendStageFinal(controller, encoder, stageId, fullText, { usage });
+    sendStageFinal(controller, stageId, fullText, { usage });
 
     return fullText;
   } else {
     const { fullText, usage } = await runStreamTextWithoutResource(options);
-    sendStageFinal(controller, encoder, stageId, fullText, { usage });
+    sendStageFinal(controller, stageId, fullText, { usage });
 
     return fullText;
   }
 }
 
 async function runStreamTextWithoutResource(options: StreamOptions) {
-  const { systemPrompt, messages, controller, encoder, stageId } = options;
+  const { systemPrompt, messages, controller, stageId } = options;
 
   let fullText = "";
 
@@ -86,7 +85,7 @@ async function runStreamTextWithoutResource(options: StreamOptions) {
     system: systemPrompt,
     messages: messages,
     onError: error => {
-      sendStageError(controller, encoder, stageId, error);
+      sendStageError(controller, stageId, error);
       throw error;
     },
   });
@@ -94,7 +93,7 @@ async function runStreamTextWithoutResource(options: StreamOptions) {
   // 流式输出用户可见的内容
   for await (const chunk of result.textStream) {
     fullText += chunk;
-    sendStageDelta(controller, encoder, stageId, fullText);
+    sendStageDelta(controller, stageId, fullText);
   }
 
   const usage = await result.usage;
@@ -109,12 +108,12 @@ async function runStreamTextWithoutResource(options: StreamOptions) {
  * 执行 streamObject 并处理流式输出
  */
 export async function runStreamObject(options: StreamObjectOptions) {
-  const { systemPrompt, messages, schema, controller, encoder, stageId, resources } = options;
+  const { systemPrompt, messages, schema, controller, stageId, resources } = options;
 
   const finalMessages = [...messages];
   const childrenUsages: StageUsage[] = [];
 
-  sendStageStart(controller, encoder, stageId);
+  sendStageStart(controller, stageId);
 
   if (isNonEmptyResources(resources)) {
     let accumulatedMarkdown = "";
@@ -126,10 +125,10 @@ export async function runStreamObject(options: StreamObjectOptions) {
         const markdown = buildSingleResourcePrompt(deltaResource);
         accumulatedMarkdown += markdown;
         // TODO 这里如何处理?
-        // sendStageDelta(controller, encoder, stageId, accumulatedMarkdown);
+        // sendStageDelta(controller, stageId, accumulatedMarkdown);
       },
       onError: error => {
-        sendStageError(controller, encoder, stageId, error);
+        sendStageError(controller, stageId, error);
         throw error;
       },
     });
@@ -154,7 +153,7 @@ export async function runStreamObject(options: StreamObjectOptions) {
     schema: zodSchema,
     messages: finalMessages,
     onError: error => {
-      sendStageError(controller, encoder, stageId, error);
+      sendStageError(controller, stageId, error);
       throw error;
     },
   });
@@ -163,7 +162,7 @@ export async function runStreamObject(options: StreamObjectOptions) {
 
   for await (const partialObject of result.partialObjectStream) {
     finalObject = partialObject as Record<string, unknown>;
-    sendStageDelta(controller, encoder, stageId, finalObject);
+    sendStageDelta(controller, stageId, finalObject);
   }
 
   const mainUsage = await result.usage;
@@ -174,14 +173,14 @@ export async function runStreamObject(options: StreamObjectOptions) {
     childrenUsages: childrenUsages.length > 0 ? childrenUsages : undefined,
   };
 
-  sendStageFinal(controller, encoder, stageId, finalObject as Record<string, unknown>, { usage });
+  sendStageFinal(controller, stageId, finalObject as Record<string, unknown>, { usage });
 
   return finalObject as Record<string, unknown>;
 }
 
 type StreamResourcesOption = Pick<StreamOptions, "resources" | "systemPrompt" | "messages"> & {
   onError?: (error: Error | unknown) => void;
-  onDelta?: (resource: any) => void;
+  onDelta?: (resource: { [key in 'name' | 'api' | 'description']: string}) => void;
 };
 
 /**

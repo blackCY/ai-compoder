@@ -6,7 +6,7 @@ import { pipelineStateAtomFamily, pipelineStagesAtomFamily } from "./atoms";
 import { consumeSSE } from "./utils/sse";
 import { StageState, PipelineState, SSECallbacks, PipelineId, StageOutput, StageUsage } from "./types";
 import { ModelMessage } from "ai";
-import { mergeData } from "./utils/mergeData";
+import { mergeData } from "../../utils/mergeData";
 import { buildMessageContext } from "./utils/messageFactory";
 
 export function usePipelineState<P extends PipelineId>(pipelineId: P): PipelineState<P> {

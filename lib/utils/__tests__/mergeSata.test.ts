@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { mergeData } from "../utils/mergeData";
+import { mergeData } from "../mergeData";
 
 describe("mergeData - 通用深度合并", () => {
   describe("边界情况", () => {

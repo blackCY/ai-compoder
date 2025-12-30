@@ -78,6 +78,47 @@ export async function fetchStages(pipelineId: string): Promise<StageRowWithResou
   }));
 }
 
+export async function fetchStage(
+  pipelineId: string,
+  stageId: string
+): Promise<StageRowWithResources | null> {
+  const supabase = getSupabaseClient();
+
+  const { data, error } = await supabase
+    .from("pipeline_stages")
+    .select(`
+      id,
+      stage_id,
+      system_prompt,
+      schema,
+      resource_id,
+      resources (
+        id,
+        name,
+        data
+      )
+    `)
+    .eq("pipeline_id", pipelineId)
+    .eq("stage_id", stageId)
+    .limit(1);
+
+  if (error) {
+    throw new Error(`Failed to fetch stage: ${error.message}`);
+  }
+
+  const rows = (data as unknown as DbStageWithResources[]) || [];
+  const row = rows[0];
+
+  if (!row) return null;
+
+  return {
+    stage_id: row.stage_id,
+    system_prompt: row.system_prompt,
+    schema: row.schema,
+    resources: row.resources?.data ?? null,
+  };
+}
+
 /**
  * Check if database is available and has stages
  * @returns true if database is configured and has stages
@@ -188,7 +229,7 @@ export async function updateStage(
       if (resInsertError) throw new Error(`Failed to create resource: ${resInsertError.message}`);
 
       // Update stage data to include the new resource_id
-      (stageData as any).resource_id = newRes.id;
+      stageData.resource_id = newRes.id as string;
     }
   }
 
@@ -222,7 +263,7 @@ export async function createStage(
   }
 ) {
   const supabase = getSupabaseClient();
-  const { resources, ...stageData } = data as any;
+  const { resources, ...stageData } = data;
   let resourceId = null;
 
   // 1. If resources are provided, handle the resources table insertion

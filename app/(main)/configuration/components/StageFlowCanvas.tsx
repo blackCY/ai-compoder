@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ReactFlow,
   Background,
@@ -61,6 +61,10 @@ export function StageFlowCanvas({
   const [stageToDelete, setStageToDelete] = useState<Stage | null>(null);
   const { mutateAsync: deleteStage, isPending: isDeleting } = useDeleteStage(pipelineId);
 
+  // Store the latest onStageClick in a ref to avoid unnecessary re-renders
+  const onStageClickRef = useRef(onStageClick);
+  onStageClickRef.current = onStageClick;
+
   const handleDelete = async () => {
     if (!stageToDelete) return;
     try {
@@ -83,7 +87,8 @@ export function StageFlowCanvas({
       position: calculateNodePosition(index, stages.length),
       data: {
         ...stage,
-        onClick: () => onStageClick(stage),
+        pipelineId,
+        onClick: () => onStageClickRef.current(stage),
         onDelete: (e: React.MouseEvent) => {
           e.stopPropagation();
           setStageToDelete(stage);
@@ -102,7 +107,7 @@ export function StageFlowCanvas({
 
     setNodes(newNodes);
     setEdges(newEdges);
-  }, [stages, onStageClick, setNodes, setEdges]);
+  }, [stages, pipelineId, setNodes, setEdges]);
 
   return (
     <div className="relative h-full w-full rounded-xl border border-white/10 bg-gradient-to-br from-gray-900 to-black overflow-hidden">
@@ -148,7 +153,7 @@ export function StageFlowCanvas({
             <DialogTitle>Delete Stage</DialogTitle>
             <DialogDescription className="text-gray-400">
               Are you sure you want to delete stage{" "}
-              <span className="font-semibold text-white">"{stageToDelete?.stage_id}"</span>? This
+              <span className="font-semibold text-white">{stageToDelete?.stage_id}</span>? This
               action cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -184,7 +189,7 @@ export function StageFlowCanvas({
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
             <p className="text-gray-400 mb-2">No stages yet</p>
-            <p className="text-sm text-gray-500">Click "Add Stage" to get started</p>
+            <p className="text-sm text-gray-500">Click Add Stage to get started</p>
           </div>
         </div>
       )}

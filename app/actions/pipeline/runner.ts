@@ -14,7 +14,6 @@ export async function runPipeline(
   controller: ReadableStreamDefaultController
 ) {
   const { messages, stages } = params;
-  const encoder = new TextEncoder();
 
   let assistantMessage = "";
   let previousStageOutput: ModelMessage | null = null;
@@ -36,7 +35,6 @@ export async function runPipeline(
       ...stage,
       messages: stageMessages,
       controller,
-      encoder,
       stageId,
     };
 

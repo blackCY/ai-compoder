@@ -100,35 +100,35 @@ export interface StageState<P extends PipelineId = PipelineId, S extends string 
 
 export type SSEEventType = "stageStart" | "stageDelta" | "stageFinal" | "stageError";
 
-export interface SSEStageStartData {
+export interface SSEStartData {
   id: string;
 }
 
-export interface SSEStageDeltaData<S = unknown> {
+export interface SSEDeltaData<S = unknown> {
   id: string;
   snapshot: S;
 }
 
-export interface SSEStageFinalData<F = unknown> {
+export interface SSEFinalData<F = unknown> {
   id: string;
   final: F;
   meta?: { usage?: StageUsage };
 }
 
-export interface SSEStageErrorData {
+export interface SSEErrorData {
   id: string;
   error: string;
 }
 
 export type SSEEventData =
-  | SSEStageStartData
-  | SSEStageDeltaData
-  | SSEStageFinalData
-  | SSEStageErrorData;
+  | SSEStartData
+  | SSEDeltaData
+  | SSEFinalData
+  | SSEErrorData;
 
 export type SSECallbacks = {
   onStart?: (data: SSEEventData) => void;
-  onDelta?: (data: SSEStageDeltaData) => void;
-  onFinal?: (data: SSEStageFinalData) => void;
-  onError?: (data: SSEStageErrorData) => void;
+  onDelta?: (data: SSEDeltaData) => void;
+  onFinal?: (data: SSEFinalData) => void;
+  onError?: (data: SSEErrorData) => void;
 };

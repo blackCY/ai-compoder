@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ReactFlowProvider } from "@xyflow/react";
 import { toast } from "sonner";
 
-import { usePipeline, useStages } from "@/lib/server-store";
+import { usePipeline, useStages, useUpdateStage, useCreateStage } from "@/lib/server-store";
 import { Stage } from "@/lib/services/pipeline/types";
 import { ConfigurationHeader } from "./components/ConfigurationHeader";
 import { StageFlowCanvas } from "./components/StageFlowCanvas";
@@ -19,36 +19,52 @@ export default function ConfigurationPage({ searchParams }: PageProps) {
   const { id } = use(searchParams);
   const router = useRouter();
   const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const { data: pipeline, isLoading: isPipelineLoading, error: pipelineError } = usePipeline(id);
   const { data: stages, isLoading: isStagesLoading, error: stagesError } = useStages(id);
+  const { mutateAsync: updateStage, isPending: isUpdating } = useUpdateStage(id);
+  const { mutateAsync: createStage, isPending: isCreating } = useCreateStage(id);
 
-  const handleStageClick = (stage: any) => {
+  const handleStageClick = (stage: Stage) => {
     setSelectedStage(stage);
-    setIsPanelOpen(true);
   };
 
   const handlePanelClose = () => {
-    setIsPanelOpen(false);
     setSelectedStage(null);
-  };
-
-  const handleSuccess = () => {
-    router.refresh();
-  };
-
-  const handleError = (error: string) => {
-    toast.error(error);
   };
 
   const handleAddStage = () => {
     setSelectedStage({
       stage_id: `new-stage-${Date.now()}`,
-      system_prompt: '',
+      system_prompt: "",
       schema: null,
     } as Stage);
-    setIsPanelOpen(true);
+  };
+
+  const handleStageSave = async (data: Partial<Stage>) => {
+    setIsSaving(true);
+    try {
+      const isNew = !data?.id;
+      if (isNew) {
+        await createStage(data);
+        toast.success("Stage created successfully");
+      } else {
+        await updateStage({
+          stageId: data.id!,
+          data,
+        });
+        toast.success("Stage updated successfully");
+      }
+
+      router.refresh();
+      setSelectedStage(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to save stage";
+      toast.error(message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (isPipelineLoading || isStagesLoading) {
@@ -74,7 +90,8 @@ export default function ConfigurationPage({ searchParams }: PageProps) {
         <div className="space-y-2">
           <h2 className="text-2xl font-bold text-white">Error loading configuration</h2>
           <p className="text-gray-400 max-w-md">
-            We encountered an issue while fetching the pipeline details. Please try refreshing the page.
+            We encountered an issue while fetching the pipeline details. Please try refreshing the
+            page.
           </p>
         </div>
         <button
@@ -116,13 +133,12 @@ export default function ConfigurationPage({ searchParams }: PageProps) {
       </div>
 
       {/* Stage Detail Panel */}
-      {isPanelOpen && (
+      {!!selectedStage && (
         <StageDetailPanel
           stage={selectedStage}
-          pipelineId={pipeline.id}
+          isSaving={isSaving || isUpdating || isCreating}
           onClose={handlePanelClose}
-          onSuccess={handleSuccess}
-          onError={handleError}
+          onSave={handleStageSave}
         />
       )}
     </div>
