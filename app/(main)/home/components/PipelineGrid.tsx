@@ -3,6 +3,7 @@
 import { usePipelines } from "@/lib/server-store";
 import { PipelineCard } from "./PipelineCard";
 import { PipelineCreateCard } from "./PipelineCreateCard";
+import { PipelineGridSkeleton } from "./PipelineGridSkeleton";
 import dynamic from "next/dynamic";
 
 export const PipelineGrid = () => {
@@ -57,5 +58,6 @@ export const PipelineGridNoSSR = dynamic(
   () => Promise.resolve(PipelineGrid),
   {
     ssr: false,
+    loading: PipelineGridSkeleton,
   }
 );
