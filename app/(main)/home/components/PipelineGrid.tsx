@@ -3,6 +3,7 @@
 import { usePipelines } from "@/lib/server-store";
 import { PipelineCard } from "./PipelineCard";
 import { PipelineCreateCard } from "./PipelineCreateCard";
+import dynamic from "next/dynamic";
 
 export const PipelineGrid = () => {
   const { data: pipelines, isLoading, error } = usePipelines();
@@ -46,3 +47,15 @@ export const PipelineGrid = () => {
     </div>
   );
 };
+
+/**
+ * PipelineGrid 的无 SSR 版本
+ * 使用 next/dynamic 的 ssr: false 选项，确保组件只在客户端渲染
+ * 避免构建时执行 TanStack Query 的 queryFn
+ */
+export const PipelineGridNoSSR = dynamic(
+  () => Promise.resolve(PipelineGrid),
+  {
+    ssr: false,
+  }
+);

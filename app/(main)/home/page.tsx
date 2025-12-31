@@ -4,7 +4,7 @@ import { BackgroundElements } from "./components/BackgroundElements";
 import { Navigation } from "./components/Navigation";
 import { HeroSection } from "./components/HeroSection";
 import { FeaturesSection } from "./components/FeaturesSection";
-import { PipelineGrid } from "./components/PipelineGrid";
+import { PipelineGridNoSSR } from "./components/PipelineGrid";
 
 export default function Home({ className }: HomeProps) {
   return (
@@ -15,16 +15,17 @@ export default function Home({ className }: HomeProps) {
       <FeaturesSection />
 
       {/* Pipeline Grid Section */}
-      <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-24" id="pipelines">
+      <section
+        className="relative z-10 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-24"
+        id="pipelines"
+      >
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-br from-white to-emerald-400 bg-clip-text text-transparent mb-4">
             可用功能
           </h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">
-            选择一个 pipeline 开始您的 AI 开发之旅
-          </p>
+          <p className="text-gray-400 max-w-2xl mx-auto">选择一个 pipeline 开始您的 AI 开发之旅</p>
         </div>
-        <PipelineGrid />
+        <PipelineGridNoSSR />
       </section>
     </main>
   );
