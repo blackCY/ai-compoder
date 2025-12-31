@@ -29,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <ViewTransitions>
-      <html lang="zh-CN" suppressHydrationWarning data-scroll-behavior="smooth">
+      <html lang="zh-CN" data-scroll-behavior="smooth">
         <head>
           {/* 使用这个调试工具后，在页面上直接选择"未阻止冒泡的文本"（没有使用该工具来选择）时，会导致页面卡死，因此这里暂时注释掉 */}
           {/* {process.env.NODE_ENV === "development" && (

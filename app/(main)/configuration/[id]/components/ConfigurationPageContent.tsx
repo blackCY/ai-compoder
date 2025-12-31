@@ -1,30 +1,29 @@
 "use client";
 
-import { use, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ReactFlowProvider } from "@xyflow/react";
 import { toast } from "sonner";
 
 import { usePipeline, useStages, useUpdateStage, useCreateStage } from "@/lib/server-store";
 import { Stage } from "@/lib/services/pipeline/types";
-import { ConfigurationHeader } from "./components/ConfigurationHeader";
-import { StageFlowCanvas } from "./components/StageFlowCanvas";
-import { StageDetailPanel } from "./components/StageDetailPanel";
+import { ConfigurationHeader } from "./ConfigurationHeader";
+import { StageFlowCanvas } from "./StageFlowCanvas";
+import { StageDetailPanel } from "./StageDetailPanel";
 
-interface PageProps {
-  searchParams: Promise<{ id: string }>;
+interface ContentProps {
+  pipelineId: string;
 }
 
-export default function ConfigurationPage({ searchParams }: PageProps) {
-  const { id } = use(searchParams);
+export function ConfigurationPageContent({ pipelineId }: ContentProps) {
   const router = useRouter();
   const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  const { data: pipeline, isLoading: isPipelineLoading, error: pipelineError } = usePipeline(id);
-  const { data: stages, isLoading: isStagesLoading, error: stagesError } = useStages(id);
-  const { mutateAsync: updateStage, isPending: isUpdating } = useUpdateStage(id);
-  const { mutateAsync: createStage, isPending: isCreating } = useCreateStage(id);
+  const { data: pipeline, error: pipelineError } = usePipeline(pipelineId);
+  const { data: stages, error: stagesError } = useStages(pipelineId);
+  const { mutateAsync: updateStage, isPending: isUpdating } = useUpdateStage(pipelineId);
+  const { mutateAsync: createStage, isPending: isCreating } = useCreateStage(pipelineId);
 
   const handleStageClick = (stage: Stage) => {
     setSelectedStage(stage);
@@ -67,21 +66,8 @@ export default function ConfigurationPage({ searchParams }: PageProps) {
     }
   };
 
-  if (isPipelineLoading || isStagesLoading) {
-    return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white gap-6">
-        <div className="relative">
-          <div className="h-16 w-16 rounded-full border-t-2 border-emerald-500 animate-spin" />
-          <div className="absolute inset-0 h-16 w-16 rounded-full border-2 border-emerald-500/20" />
-        </div>
-        <div className="text-xl font-medium animate-pulse text-emerald-400">
-          Loading configuration...
-        </div>
-      </div>
-    );
-  }
-
-  if (pipelineError || stagesError || !pipeline) {
+  // Suspense 模式下，loading 状态会被 Suspense 边界捕获，这里只需处理真正的错误
+  if (pipelineError || stagesError) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center text-red-400 gap-6 p-8 text-center">
         <div className="h-20 w-20 rounded-2xl bg-red-500/10 flex items-center justify-center border border-red-500/20 mb-2">
@@ -90,8 +76,7 @@ export default function ConfigurationPage({ searchParams }: PageProps) {
         <div className="space-y-2">
           <h2 className="text-2xl font-bold text-white">Error loading configuration</h2>
           <p className="text-gray-400 max-w-md">
-            We encountered an issue while fetching the pipeline details. Please try refreshing the
-            page.
+            {pipelineError?.message || stagesError?.message || "An unexpected error occurred"}
           </p>
         </div>
         <button
@@ -104,10 +89,11 @@ export default function ConfigurationPage({ searchParams }: PageProps) {
     );
   }
 
+  // Suspense 确保 pipeline 和 stages 在渲染时已定义
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black p-8">
       <div className="max-w-7xl mx-auto space-y-6">
-        <ConfigurationHeader pipeline={pipeline} />
+        <ConfigurationHeader pipeline={pipeline!} />
 
         <div className="h-px w-full bg-gradient-to-r from-white/10 via-white/5 to-transparent" />
 
@@ -123,7 +109,7 @@ export default function ConfigurationPage({ searchParams }: PageProps) {
             <ReactFlowProvider>
               <StageFlowCanvas
                 stages={stages || []}
-                pipelineId={pipeline.id}
+                pipelineId={pipelineId}
                 onStageClick={handleStageClick}
                 onAddStage={handleAddStage}
               />

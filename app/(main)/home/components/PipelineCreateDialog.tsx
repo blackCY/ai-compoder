@@ -43,7 +43,7 @@ export function PipelineCreateDialog({ open, onOpenChange }: PipelineCreateDialo
       setDescription("");
       
       // 跳转到配置页面
-      router.push(`/configuration?id=${result.id}`);
+      router.push(`/configuration/${result.id}`);
     } catch (error) {
       console.error("Failed to create pipeline:", error);
       toast.error("创建失败，请稍后重试");

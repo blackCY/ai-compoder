@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Loader2, XCircle, Play, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useStageRun } from "@/app/(main)/configuration/hooks/useStageRun";
+import { useStageRun } from "../../hooks/useStageRun";
 import { TextResultViewer } from "./components/TextResultViewer";
 import { ObjectResultViewer } from "./components/ObjectResultViewer";
 import { UsageDisplay } from "./components/UsageDisplay";

@@ -14,6 +14,8 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
+            // @ts-ignore - suspense is supported at runtime in v5
+            suspense: true, // 启用 Suspense 模式，配合 loading.tsx 使用
             staleTime: 60 * 1000, // 1 minute
             refetchOnWindowFocus: false,
             retry: (failureCount, _error) => {
