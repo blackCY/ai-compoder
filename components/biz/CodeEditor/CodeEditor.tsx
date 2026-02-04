@@ -4,10 +4,11 @@ import { useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { CodeEditorProps } from "./types";
 import { getLanguageFromFilename } from "@/components/biz/CodeEditor/utils";
-import { Editor, OnMount, BeforeMount } from "@monaco-editor/react";
+import { BaseCodeEditor } from "./components/MonacoEditor";
+import type { OnMount, BeforeMount } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 
-const DEFAULT_PLACEHOLDER = '// Start coding...'
+const DEFAULT_PLACEHOLDER = "// Start coding...";
 
 export const CodeEditor: React.FC<CodeEditorProps> = ({
   className,
@@ -74,7 +75,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         {filename || detectedLanguage}
       </div>
 
-      <Editor
+      <BaseCodeEditor
         height="100%"
         path={filename || "index.js"}
         language={detectedLanguage}

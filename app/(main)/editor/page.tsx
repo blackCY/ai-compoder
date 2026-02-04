@@ -1,27 +1,21 @@
 import { EditorPageContent } from "./components/EditorPageContent";
 import type { PipelineId } from "@/lib/store/pipeline/types";
+import EditorLoading from "./loading";
+import { Suspense } from "react";
 
 interface PageProps {
-  searchParams: Promise<{ name?: PipelineId; id?: string }>;
+  searchParams: Promise<{ name: PipelineId; id: string }>;
 }
+
+// ISR：60秒后重新验证
+export const revalidate = 60;
 
 export default async function EditorPage({ searchParams }: PageProps) {
   const { name, id } = await searchParams;
 
-  if (!id) {
-    return (
-      <div className="min-h-screen bg-[#0a0b0e] flex items-center justify-center text-[#e1e3e8]">
-        <div className="text-center space-y-4">
-          <h2 className="text-2xl font-semibold text-red-400">
-            Missing Pipeline ID
-          </h2>
-          <p className="text-gray-400">
-            Please provide a pipeline ID in the URL.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return <EditorPageContent name={name} id={id} />;
+  return (
+    <Suspense fallback={<EditorLoading />}>
+      <EditorPageContent name={name} id={id} />
+    </Suspense>
+  );
 }

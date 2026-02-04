@@ -36,6 +36,8 @@ export const TypeScript: Story = {
   id: number;
   name: string;
   email: string;
+  return this.users.find(user => user.id === id);
+  }
 }
 
 class UserService {
