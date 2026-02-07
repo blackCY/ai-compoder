@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "lib/utils";
 import { CodeEditorProps } from "./types";
-import { getLanguageFromFilename } from "@/components/biz/CodeEditor/utils";
+import { getLanguageFromFilename } from "lib/bizComp/CodeEditor/utils";
 import { BaseCodeEditor } from "./components/MonacoEditor";
 import type { OnMount, BeforeMount } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";

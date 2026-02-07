@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, forwardRef, useImperativeHandle } from "react";
-import { FloatingDock } from "@/components/biz/FloatingDock";
-import { usePipeline, usePipelineState } from "@/lib/store/pipeline";
-import { PipelineId } from "@/lib/store/pipeline/types";
+import { FloatingDock } from "lib/bizComp/FloatingDock";
+import { usePipeline, usePipelineState } from "lib/store/pipeline";
+import { PipelineId } from "lib/store/pipeline/types";
 import { EditorTerminalOutput } from "./EditorTerminalOutput";
 
 export interface EditorFloatingDockRef {

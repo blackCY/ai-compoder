@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fetchPipelines, createPipeline } from "@/db/queries";
+import { fetchPipelines, createPipeline } from "db/queries";
 
 export async function GET() {
   try {

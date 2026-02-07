@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fetchPipelines, updatePipeline, deletePipeline } from "@/db/queries";
+import { fetchPipelines, updatePipeline, deletePipeline } from "db/queries";
 
 export async function GET(
   request: Request,

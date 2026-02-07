@@ -128,11 +128,11 @@
 'use client';
 
 import React from 'react';
-import { cn } from '@/lib/utils';
-import { usePageData } from '@/lib/server-store';
+import { cn } from 'lib/utils';
+import { usePageData } from 'lib/serverStore';
 import { PageProps } from './types';
-import { BusinessComponent } from '@/components/biz/BusinessComponent';
-import { BaseComponent } from '@/components/ui/BaseComponent';
+import { BusinessComponent } from 'lib/bizComp/BusinessComponent';
+import { BaseComponent } from 'lib/ui/BaseComponent';
 
 export default function Page({ className, ...props }: PageProps) {
   const { data, isLoading, error } = usePageData();
@@ -164,8 +164,8 @@ export default function Page({ className, ...props }: PageProps) {
 
 ```tsx
 // loading.tsx
-import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
+import { Skeleton } from 'lib/ui/skeleton';
+import { cn } from 'lib/utils';
 
 export default function Loading({ className }: { className?: string }) {
   return (
@@ -194,8 +194,8 @@ export default function Loading({ className }: { className?: string }) {
 'use client';
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { Button } from 'lib/ui/button';
+import { cn } from 'lib/utils';
 
 interface ErrorProps {
   error: Error & { digest?: string };

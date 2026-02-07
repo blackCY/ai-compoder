@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Editor from '@monaco-editor/react';
-import { Button } from '@/components/ui/button';
+import { Button } from 'lib/ui/button';
 import { JsonSchema } from 'json-schema-to-zod';
 
 interface SchemaEditorProps {

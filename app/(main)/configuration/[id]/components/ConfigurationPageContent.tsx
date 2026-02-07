@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { ReactFlowProvider } from "@xyflow/react";
 import { toast } from "sonner";
 
-import { usePipeline, useStages, useUpdateStage, useCreateStage } from "@/lib/server-store";
-import { Stage } from "@/lib/services/pipeline/types";
+import { usePipeline, useStages, useUpdateStage, useCreateStage } from "lib/serverStore";
+import { Stage } from "lib/services/pipeline/types";
 import { ConfigurationHeader } from "./ConfigurationHeader";
 import { StageFlowCanvas } from "./StageFlowCanvas";
 import { StageDetailPanel } from "./StageDetailPanel";

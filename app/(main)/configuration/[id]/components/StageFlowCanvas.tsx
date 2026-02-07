@@ -14,10 +14,10 @@ import {
   BackgroundVariant,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { Stage } from "@/lib/services/pipeline/types";
+import { Stage } from "lib/services/pipeline/types";
 import { StageNode } from "./StageNode";
 import { StageToolbar } from "./StageToolbar";
-import { useDeleteStage } from "@/lib/server-store";
+import { useDeleteStage } from "lib/serverStore";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -26,8 +26,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "lib/ui/dialog";
+import { Button } from "lib/ui/button";
 import { Loader2 } from "lucide-react";
 
 interface StageFlowCanvasProps {

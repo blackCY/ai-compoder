@@ -19,8 +19,27 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
-      "react-renderer": ["./artifacts/react-renderer/src/index.ts"]
+      "react-renderer": ["./artifacts/react-renderer/src/index.ts"],
+      "lib/ui": ["./lib/components/ui"],
+      "lib/ui/*": ["./lib/components/ui/*"],
+      "lib/bizComp": ["./lib/components/biz"],
+      "lib/bizComp/*": ["./lib/components/biz/*"],
+      "lib/hooks": ["./lib/hooks"],
+      "lib/hooks/*": ["./lib/hooks/*"],
+      "lib/request": ["./lib/request"],
+      "lib/request/*": ["./lib/request/*"],
+      "lib/serverStore": ["./lib/server-store"],
+      "lib/serverStore/*": ["./lib/server-store/*"],
+      "lib/services": ["./lib/services"],
+      "lib/services/*": ["./lib/services/*"],
+      "lib/store": ["./lib/store"],
+      "lib/store/*": ["./lib/store/*"],
+      "lib/utils": ["./lib/utils"],
+      "lib/utils/*": ["./lib/utils/*"],
+      "db": ["./db"],
+      "db/*": ["./db/*"],
+      "actions": ["./app/actions"],
+      "actions/*": ["./app/actions/*"]
     }
   },
   "include": [

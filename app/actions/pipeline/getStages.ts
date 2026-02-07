@@ -6,7 +6,7 @@ import { StageConfig } from "./types";
 export const getStages = async (pipelineId: string): Promise<StageConfig[]> => {
   try {
     // Try to fetch from database first
-    const { fetchStages } = await import("@/db/queries");
+    const { fetchStages } = await import("db/queries");
 
     // Use pipelineId directly to fetch stages
     const dbStages = await fetchStages(pipelineId);
@@ -31,7 +31,7 @@ export const getStages = async (pipelineId: string): Promise<StageConfig[]> => {
  */
 export const getStage = async (pipelineId: string, stageId: string): Promise<StageConfig | null> => {
   try {
-    const { fetchStage } = await import("@/db/queries");
+    const { fetchStage } = await import("db/queries");
     const s = await fetchStage(pipelineId, stageId);
     if (!s) return null;
     return {

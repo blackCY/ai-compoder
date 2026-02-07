@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { consumeSSE } from "@/lib/utils/stream";
-import { post } from "@/lib/request";
-import { Stage } from "@/lib/services/pipeline/types";
-import { StageUsage } from "@/app/actions/pipeline/types";
-import { SSEDeltaData, SSEFinalData, SSEErrorData } from "@/lib/store/pipeline/types";
+import { consumeSSE } from "lib/utils/stream";
+import { post } from "lib/request";
+import { Stage } from "lib/services/pipeline/types";
+import { StageUsage } from "actions/pipeline/types";
+import { SSEDeltaData, SSEFinalData, SSEErrorData } from "lib/store/pipeline/types";
 
 interface UseStageRunOptions {
   pipelineId: string;

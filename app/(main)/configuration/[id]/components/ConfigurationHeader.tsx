@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Edit2, Trash2 } from "lucide-react";
-import { Pipeline } from "@/lib/services/pipeline/types";
-import { Button } from "@/components/ui/button";
+import { Pipeline } from "lib/services/pipeline/types";
+import { Button } from "lib/ui/button";
 import { PipelineEditDialog } from "./PipelineEditDialog";
 
 import { PipelineDeleteDialog } from "./PipelineDeleteDialog";

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { updateStage, deleteStage } from "@/db/queries";
+import { updateStage, deleteStage } from "db/queries";
 
 export async function PATCH(
   request: Request,

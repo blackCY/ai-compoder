@@ -1,5 +1,5 @@
-import { getStages } from "@/app/actions/pipeline/getStages";
-import { runPipeline } from "@/app/actions/pipeline/runner";
+import { getStages } from "actions/pipeline/getStages";
+import { runPipeline } from "actions/pipeline/runner";
 
 export async function POST(req: Request) {
   const { messages, pipelineId } = await req.json();

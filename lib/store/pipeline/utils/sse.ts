@@ -1,7 +1,7 @@
-import { runPipelineStream } from "@/lib/services";
-import { PipelineStreamParams } from "@/lib/services/pipeline/types";
+import { runPipelineStream } from "lib/services";
+import { PipelineStreamParams } from "lib/services/pipeline/types";
 import { SSECallbacks } from "../types";
-import { consumeSSE as consumeSSEStream } from "@/lib/utils/stream";
+import { consumeSSE as consumeSSEStream } from "lib/utils/stream";
 
 /**
  * 消费 SSE 流

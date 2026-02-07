@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Handle, Position } from "@xyflow/react";
 import { Trash2, Play, Settings } from "lucide-react";
-import { Stage } from "@/lib/services/pipeline/types";
+import { Stage } from "lib/services/pipeline/types";
 import { StageRunResultDialog } from "./StageRunResultDialog/StageRunResultDialog";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "lib/ui/tooltip";
 
 interface StageNodeProps {
   data: Stage & {

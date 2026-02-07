@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fetchStagesFull, createStage } from "@/db/queries";
+import { fetchStagesFull, createStage } from "db/queries";
 
 export async function GET(
   request: Request,

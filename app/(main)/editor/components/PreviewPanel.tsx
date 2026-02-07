@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as antd from "antd";
-import { cn } from "@/lib/utils";
+import { cn } from "lib/utils";
 import type { FileMap } from "react-renderer";
 import dynamic from "next/dynamic";
 import { AlertTriangle, Wand2 } from "lucide-react";

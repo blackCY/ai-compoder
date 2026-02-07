@@ -1,6 +1,6 @@
 "use client";
 
-import { usePipelines } from "@/lib/server-store";
+import { usePipelines } from "lib/serverStore";
 import { PipelineCard } from "./PipelineCard";
 import { PipelineCreateCard } from "./PipelineCreateCard";
 import { PipelineGridSkeleton } from "./PipelineGridSkeleton";

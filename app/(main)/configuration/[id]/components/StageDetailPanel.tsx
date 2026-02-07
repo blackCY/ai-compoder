@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { X, Loader2 } from "lucide-react";
-import { Stage } from "@/lib/services/pipeline/types";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Stage } from "lib/services/pipeline/types";
+import { Button } from "lib/ui/button";
+import { Input } from "lib/ui/input";
 import { SystemPromptEditor } from "./StageEditor/SystemPromptEditor";
 import { ResourceEditor } from "./StageEditor/ResourceEditor";
 import { SchemaEditor } from "./StageEditor/SchemaEditor";

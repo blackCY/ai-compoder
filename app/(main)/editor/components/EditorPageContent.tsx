@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { EditorLayout, EditorFloatingDock } from "./index";
 import type { EditorFloatingDockRef } from "./index";
-import type { PipelineId } from "@/lib/store/pipeline/types";
+import type { PipelineId } from "lib/store/pipeline/types";
 
 interface ContentProps {
   name?: PipelineId;

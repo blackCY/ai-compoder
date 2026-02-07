@@ -1,5 +1,5 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { Skeleton } from "lib/ui/skeleton";
+import { cn } from "lib/utils";
 import { HomeLoadingSkeletonProps } from "./types";
 
 export default function HomeLoading({ className }: HomeLoadingSkeletonProps) {

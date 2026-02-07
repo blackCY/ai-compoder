@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Play, Settings, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { Pipeline } from "@/lib/services/pipeline/types";
+import { Pipeline } from "lib/services/pipeline/types";
 
 interface PipelineCardProps {
   pipeline: Pipeline;

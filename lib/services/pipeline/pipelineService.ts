@@ -3,7 +3,7 @@
  * 纯 API 调用层，使用 lib/request 实例
  */
 
-import { request } from "@/lib/request";
+import { request } from "lib/request";
 import { Pipeline, PipelineStreamParams } from "./types";
 
 /**

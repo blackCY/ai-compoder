@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getStages, createStage, updateStage, deleteStage } from "@/lib/services/pipeline/pipelineService";
-import { Stage } from "@/lib/services/pipeline/types";
+import { getStages, createStage, updateStage, deleteStage } from "lib/services/pipeline/pipelineService";
+import { Stage } from "lib/services/pipeline/types";
 
 export const useStages = (pipelineId: string) => {
   return useQuery<Stage[]>({

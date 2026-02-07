@@ -1,5 +1,5 @@
 import { EditorPageContent } from "./components/EditorPageContent";
-import type { PipelineId } from "@/lib/store/pipeline/types";
+import type { PipelineId } from "lib/store/pipeline/types";
 import EditorLoading from "./loading";
 import { Suspense } from "react";
 

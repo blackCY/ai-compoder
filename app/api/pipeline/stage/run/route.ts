@@ -1,5 +1,5 @@
-import { runStreamText, runStreamObject } from "@/app/actions/pipeline/stream";
-import { getStage } from "@/app/actions/pipeline/getStages";
+import { runStreamText, runStreamObject } from "actions/pipeline/stream";
+import { getStage } from "actions/pipeline/getStages";
 import { ModelMessage } from "ai";
 
 interface RunStageRequest {

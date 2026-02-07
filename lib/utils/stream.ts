@@ -4,7 +4,7 @@ import {
   SSEDeltaData,
   SSEFinalData,
   SSEErrorData,
-} from "@/lib/store/pipeline/types";
+} from "lib/store/pipeline/types";
 
 /**
  * 通用 SSE 流消费方法

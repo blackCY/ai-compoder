@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "lib/utils";
 import { HomeProps } from "./types";
 import { BackgroundElements } from "./components/BackgroundElements";
 import { Navigation } from "./components/Navigation";

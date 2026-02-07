@@ -4,7 +4,7 @@ import { AlertTriangle, Loader2, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "lib/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,8 +12,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useDeletePipeline } from "@/lib/server-store";
+} from "lib/ui/dialog";
+import { useDeletePipeline } from "lib/serverStore";
 
 interface PipelineDeleteDialogProps {
   isOpen: boolean;

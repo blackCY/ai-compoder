@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "lib/ui/card";
 import { Code, Layers, Zap, Terminal } from "lucide-react";
 
 interface Feature {

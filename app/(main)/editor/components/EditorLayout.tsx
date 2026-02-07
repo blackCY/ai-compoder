@@ -1,13 +1,13 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { CodeEditor } from "@/components/biz/CodeEditor";
+import { CodeEditor } from "lib/bizComp/CodeEditor";
 import { PreviewPanel } from "./PreviewPanel";
 import { EditorSidebar } from "./EditorSidebar";
 import { UsagePanel } from "./UsagePanel";
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { usePipelineStage, useStageUpdate } from "@/lib/store/pipeline/hooks";
-import type { GeneratedFileName, GenerateCodeOutput, PipelineId } from "@/lib/store/pipeline/types";
+import { usePipelineStage, useStageUpdate } from "lib/store/pipeline/hooks";
+import type { GeneratedFileName, GenerateCodeOutput, PipelineId } from "lib/store/pipeline/types";
 import type { FileMap } from "react-renderer";
 import { toast } from "sonner";
 

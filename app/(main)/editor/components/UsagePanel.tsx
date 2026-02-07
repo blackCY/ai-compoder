@@ -3,9 +3,9 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Coins } from "lucide-react";
-import { usePipelineState } from "@/lib/store/pipeline/hooks";
-import { useOnClickOutside } from "@/lib/hooks/useOnClickOutside";
-import { PipelineId } from "@/lib/store/pipeline/types";
+import { usePipelineState } from "lib/store/pipeline/hooks";
+import { useOnClickOutside } from "lib/hooks/useOnClickOutside";
+import { PipelineId } from "lib/store/pipeline/types";
 
 /** 格式化数字：超过 1000 显示为 k 单位，保留 2 位小数以提高精度 */
 function formatNumber(num: number | undefined): string {

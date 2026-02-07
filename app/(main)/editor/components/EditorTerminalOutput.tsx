@@ -2,9 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
-import { usePipelineStage } from "@/lib/store/pipeline";
+import { usePipelineStage } from "lib/store/pipeline";
 import { StageOutputDisplay } from "./StageOutputDisplay";
-import { PipelineId } from "@/lib/store/pipeline/types";
+import { PipelineId } from "lib/store/pipeline/types";
 
 interface EditorTerminalOutputProps {
   isVisible: boolean;

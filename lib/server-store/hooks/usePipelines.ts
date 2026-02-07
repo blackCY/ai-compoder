@@ -5,8 +5,8 @@ import {
   updatePipeline, 
   deletePipeline,
   createPipeline 
-} from "@/lib/services/pipeline/pipelineService";
-import { Pipeline } from "@/lib/services/pipeline/types";
+} from "lib/services/pipeline/pipelineService";
+import { Pipeline } from "lib/services/pipeline/types";
 
 export const usePipelines = () => {
   return useQuery<Pipeline[]>({

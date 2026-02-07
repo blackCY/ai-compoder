@@ -2,7 +2,7 @@
 
 import { Plus, ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
 import { useReactFlow } from "@xyflow/react";
-import { Button } from "@/components/ui/button";
+import { Button } from "lib/ui/button";
 
 interface StageToolbarProps {
   onAddStage: () => void;

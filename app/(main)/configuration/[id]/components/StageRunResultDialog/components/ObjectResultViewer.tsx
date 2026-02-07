@@ -1,6 +1,6 @@
 "use client";
 
-import { CodeEditor } from "@/components/biz/CodeEditor";
+import { CodeEditor } from "lib/bizComp/CodeEditor";
 import { Braces } from "lucide-react";
 
 export interface ObjectResultViewerProps {

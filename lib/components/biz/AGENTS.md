@@ -104,7 +104,7 @@
 'use client';
 
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from 'lib/utils';
 import { ComponentProps } from './types';
 // 只有当需要变体时才导入 variants.ts
 import { componentVariants } from './variants';

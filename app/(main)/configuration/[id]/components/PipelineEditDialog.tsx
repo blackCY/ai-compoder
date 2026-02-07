@@ -2,17 +2,17 @@
 
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "lib/ui/button";
+import { Input } from "lib/ui/input";
+import { Textarea } from "lib/ui/textarea";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { useUpdatePipeline } from "@/lib/server-store";
+} from "lib/ui/dialog";
+import { useUpdatePipeline } from "lib/serverStore";
 import { toast } from "sonner";
 
 interface PipelineEditDialogProps {

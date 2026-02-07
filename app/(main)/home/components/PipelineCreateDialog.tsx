@@ -9,11 +9,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useCreatePipeline } from "@/lib/server-store/hooks/usePipelines";
+} from "lib/ui/dialog";
+import { Button } from "lib/ui/button";
+import { Input } from "lib/ui/input";
+import { Textarea } from "lib/ui/textarea";
+import { useCreatePipeline } from "lib/serverStore/hooks/usePipelines";
 import { toast } from "sonner";
 
 interface PipelineCreateDialogProps {

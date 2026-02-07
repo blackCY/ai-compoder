@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { Plus, Trash2, Key, Info, Globe, ChevronDown, ChevronUp, FileJson } from "lucide-react";
 import Editor from "@monaco-editor/react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
-import { Stage } from "@/lib/services/pipeline/types";
+import { Button } from "lib/ui/button";
+import { Input } from "lib/ui/input";
+import { Textarea } from "lib/ui/textarea";
+import { cn } from "lib/utils";
+import { Stage } from "lib/services/pipeline/types";
 import { toast } from "sonner";
 
 // Extract the type of the resources data from Stage
