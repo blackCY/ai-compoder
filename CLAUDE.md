@@ -64,8 +64,8 @@ This front-end part of this project follows a **strict 4-layer architecture** wi
 - **Type Organization**: API types in `services/types/`, shared with corresponding service files
 
 ### 4. Component Layers
-- **Business Components** (`/components/biz`): Reusable business modules (chat interface, AI generation)
-- **Base Components** (`/components/ui`): Atomic UI components from Shadcn/ui
+- **Business Components** (`/lib/components/biz`): Reusable business modules (chat interface, AI generation)
+- **Base Components** (`/lib/components/ui`): Atomic UI components from Shadcn/ui
 
 ## Strict Dependency Rules
 
@@ -115,7 +115,7 @@ This front-end part of this project follows a **strict 4-layer architecture** wi
 - **Interactive chat interface** with example prompts
 - **Code highlighting** and display with matrix background effects
 - **Keyboard shortcuts** (Ctrl+Enter) for quick generation
-- **Location**: `/components/biz/chat/` directory
+- **Location**: `/lib/components/biz/chat/` directory
 
 ### Advanced UI/UX
 - **Glass morphism** effects with backdrop filters
@@ -136,7 +136,7 @@ This front-end part of this project follows a **strict 4-layer architecture** wi
 ### Directory-Specific Guidelines
 - **CRITICAL**: When working in any subdirectory that contains an `AGENTS.md` or `CLAUDE.md` file, you MUST read and strictly follow the specifications defined in that file
 - **Examples**: 
-  - `components/biz/CLAUDE.md` - Contains specific rules for business component development
+  - `lib/components/biz/CLAUDE.md` - Contains specific rules for business component development
   - Other directories may have their own `AGENTS.md` files with domain-specific requirements
 - **Priority**: Directory-specific guidelines take precedence over general project guidelines when working within that directory
 - **Discovery**: Always check for `AGENTS.md` or `CLAUDE.md` files when entering a new directory structure
@@ -175,10 +175,11 @@ This front-end part of this project follows a **strict 4-layer architecture** wi
 │   │   │                        # Contains global styles, fonts, theme providers, etc.
 │   ├── not-found.tsx            # 404 page - custom not found page
 │   └── globals.css               # Global styles with Tailwind v4
-├── components/
-│   ├── biz/                      # Business components (reusable business modules)
-│   └── ui/                       # Base UI components (Shadcn/ui)
-│       │                        # Atomic UI components like buttons, inputs, cards, etc.
+├── lib/
+│   ├── components/
+│   │   ├── biz/                  # Business components (reusable business modules)
+│   │   └── ui/                   # Base UI components (Shadcn/ui)
+│   │       │                    # Atomic UI components like buttons, inputs, cards, etc.
 ├── lib/
 │   ├── server-store/             # TanStack Query data layer
 │   │   │                        # Manages server data fetching, caching, state synchronization
@@ -198,8 +199,8 @@ This front-end part of this project follows a **strict 4-layer architecture** wi
 
 1. **Page-specific Resources**: Each page route directory's `components/`, `utils/`, `types/` are for that page only
 2. **Shared Resource Extraction**: When a component or utility function needs to be used by multiple pages, extract it to:
-   - `components/biz/` - Reusable business components
-   - `components/ui/` - Reusable base UI components
+   - `lib/components/biz/` - Reusable business components
+   - `lib/components/ui/` - Reusable base UI components
    - `lib/utils.ts` - Reusable common utility functions
 3. **Naming Conventions**: Page-specific resources should use clear prefixes or namespaces to avoid conflicts with shared resources
 
@@ -221,13 +222,13 @@ Required environment variables:
 ## Development Guidelines
 
 ### When Working with AI Generation
-- Always use the existing AI chat interface in `components/biz/chat/`
+- Always use the existing AI chat interface in `lib/components/biz/chat/`
 - Follow the streaming pattern for real-time code display
 - Integrate with the existing API endpoint structure
 - Use the matrix background and glass morphism effects for consistency
 
 ### Component Development
-- Prioritize using existing base components from `components/ui/`
+- Prioritize using existing base components from `lib/components/ui/`
 - Business components should be highly reusable across pages
 - Avoid over-abstraction - keep one-off logic in Page Layer
 

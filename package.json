@@ -9,7 +9,10 @@
     "lint": "eslint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test": "vitest"
+    "test": "vitest",
+    "test:run": "vitest --run",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "@ai-sdk/openai": "2.0.80",
@@ -61,6 +64,7 @@
     "@types/react-dom": "^19",
     "@vitest/browser-playwright": "^4.0.14",
     "@vitest/coverage-v8": "^4.0.14",
+    "baseline-browser-mapping": "2.10.0",
     "dotenv": "17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
