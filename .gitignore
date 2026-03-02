@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+**/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -10,15 +10,19 @@
 !.yarn/releases
 !.yarn/versions
 
+# lockfiles
+**/pnpm-lock.yaml
+!/pnpm-lock.yaml
+
 # testing
-/coverage
+**/coverage
 
 # next.js
-/.next/
-/out/
+**/.next/
+**/out/
 
 # production
-/build
+**/build
 
 # misc
 .DS_Store
@@ -44,8 +48,7 @@ next-env.d.ts
 storybook-static
 
 .claude
-openspec
-drafts
-prd-docs
 .kiro
-workflow-docs
+openspec
+
+docs

@@ -1,4 +1,4 @@
-import { ModelMessage } from "ai";
+import { type JsonSchema, ModelMessage } from "ai";
 
 export interface PipelineStreamParams {
   messages: ModelMessage[];
@@ -17,7 +17,7 @@ export interface Stage {
   pipeline_id: string;
   stage_id: string;
   system_prompt: string;
-  schema: any;
+  schema: JsonSchema | null;
   resource_id: string | null;
   created_at: string;
   resources?: {

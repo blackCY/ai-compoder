@@ -36,7 +36,7 @@ const eslintConfig = defineConfig([
   },
   // 忽略 dist 目录和编译产物
   {
-    ignores: ["**/dist/**", "artifacts/**/dist/**"],
+    ignores: ["**/dist/**", "../../packages/**/dist/**", "public/monaco/**"],
   },
 ]);
 

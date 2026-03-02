@@ -93,7 +93,7 @@ export function StageDetailPanel({
                 resources: {
                   ...prev.resources,
                   data: val,
-                } as any,
+                } as Stage["resources"],
               }))
             }
             disabled={isSaving}

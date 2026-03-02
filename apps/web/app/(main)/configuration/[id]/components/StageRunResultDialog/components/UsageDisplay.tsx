@@ -1,7 +1,7 @@
 "use client";
 
 import { LanguageModelUsage } from "ai";
-import { Coins, Zap, Activity } from "lucide-react";
+import { Coins, Zap, Activity, type LucideIcon } from "lucide-react";
 
 export interface UsageDisplayProps {
   usage: LanguageModelUsage | null;
@@ -11,7 +11,7 @@ function UsageToken({ label, value, color, icon: Icon }: {
   label: string;
   value: number;
   color: "cyan" | "purple" | "emerald";
-  icon: any;
+  icon: LucideIcon;
 }) {
   const colorClasses = {
     cyan: {

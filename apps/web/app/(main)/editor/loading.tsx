@@ -5,6 +5,8 @@ interface LoadingProps {
   className?: string;
 }
 
+const CODE_LINE_WIDTHS = [62, 78, 69, 84, 73, 91, 66, 88, 75, 95, 71, 82, 68, 86, 79];
+
 export default function EditorLoading({ className }: LoadingProps) {
   return (
     <div
@@ -63,7 +65,7 @@ export default function EditorLoading({ className }: LoadingProps) {
               <Skeleton
                 key={index}
                 className="h-4 w-full bg-[#23252b]/30"
-                style={{ width: `${60 + Math.random() * 40}%` }}
+                style={{ width: `${CODE_LINE_WIDTHS[index % CODE_LINE_WIDTHS.length]}%` }}
               />
             ))}
           </div>

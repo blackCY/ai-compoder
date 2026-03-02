@@ -23,7 +23,7 @@ export default defineConfig({
       'lib/utils': path.join(dirname, './lib/utils'),
       'db': path.join(dirname, './db'),
       'actions': path.join(dirname, './app/actions'),
-      'react-renderer': path.join(dirname, './artifacts/react-renderer/src/index.ts'),
+      'react-renderer': path.join(dirname, '../../packages/react-renderer/src/index.ts'),
     },
   },
   test: {
@@ -35,7 +35,7 @@ export default defineConfig({
         'node_modules/**',
         '.next/**',
         '.storybook/**',
-        'artifacts/**',
+        '../../packages/**',
         '**/*.stories.*',
         '**/*.config.*',
         '**/dist/**',

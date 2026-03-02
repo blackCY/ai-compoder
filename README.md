@@ -75,39 +75,26 @@
 
 ```
 ai-compoder/
-├── app/                          # Next.js App Router
-│   ├── (main)/                   # 主路由组
-│   │   ├── home/                 # 首页
-│   │   ├── configuration/[id]/   # Pipeline 配置页
-│   │   ├── editor/               # 代码编辑器页
-│   │   ├── api/                  # API 路由
-│   │   └── actions/              # Server Actions
-│   ├── layout.tsx                # 根布局
-│   └── globals.css               # 全局样式
-├── lib/
-│   ├── components/               # 组件库
-│   │   ├── ui/                   # 基础 UI 组件
-│   │   └── biz/                  # 业务组件
-│   ├── server-store/             # 服务端状态管理
-│   ├── services/                 # API 服务层
-│   ├── store/                    # 客户端状态管理
-│   ├── request/                  # HTTP 请求工具
-│   └── utils.ts                  # 工具函数
-├── db/                          # 数据库相关
-│   ├── migrations/               # 数据库迁移
-│   ├── queries.ts                # 数据库查询
-│   └── types.ts                  # 数据库类型
-└── public/                      # 静态资源
+├── apps/
+│   └── web/                      # Next.js Web 应用
+│       ├── app/                  # App Router（页面、api、actions）
+│       ├── lib/                  # Web 端内部模块
+│       ├── db/                   # Web 端数据库访问层
+│       ├── public/               # Web 静态资源
+│       └── package.json
+├── packages/
+│   └── react-renderer/           # 可复用渲染器包（workspace）
+└── package.json                  # workspace 根编排脚本
 ```
 
 ### 🏛️ 四层架构
 
 项目严格遵循**四层架构设计**：
 
-1. **页面层** (`/app`) - 页面布局和组件组装
-2. **Server-Store 层** (`/lib/server-store`) - 数据交互和缓存
-3. **API Service 层** (`/lib/services`) - 纯粹的 API 调用
-4. **组件层** (`/lib/components`) - UI 组件复用
+1. **页面层** (`/apps/web/app`) - 页面布局和组件组装
+2. **Server-Store 层** (`/apps/web/lib/server-store`) - 数据交互和缓存
+3. **API Service 层** (`/apps/web/lib/services`) - 纯粹的 API 调用
+4. **组件层** (`/apps/web/lib/components`) - UI 组件复用
 
 **依赖规则**：
 - ✅ 页面层 → Server-Store 层 → API Service 层 → 后端 API
@@ -127,7 +114,7 @@ pnpm install
 
 #### 配置环境变量
 
-创建 `.env.local` 文件：
+创建 `apps/web/.env.local` 文件：
 
 ```bash
 # AI 提供商配置
@@ -144,7 +131,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 #### 启动开发服务器
 
 ```bash
-pnpm dev
+pnpm web:dev
 ```
 
 访问 [http://localhost:3000](http://localhost:3000) 查看应用。
@@ -152,8 +139,17 @@ pnpm dev
 #### 构建生产版本
 
 ```bash
-pnpm build
-pnpm start
+pnpm web:build
+pnpm web:start
+```
+
+#### Monorepo 工作区命令
+
+```bash
+pnpm ws:build
+pnpm ws:lint
+pnpm ws:test
+pnpm ws:typecheck
 ```
 
 ### 📖 主要功能页面
@@ -205,7 +201,7 @@ pnpm install
 Then, run the development server:
 
 ```bash
-pnpm dev
+pnpm web:dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -229,8 +225,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ### Build for Production
 
 ```bash
-pnpm build
-pnpm start
+pnpm web:build
+pnpm web:start
 ```
 
 ## Features

@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Loader2, Trash2, X } from "lucide-react";
+import { AlertTriangle, Loader2, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -55,7 +55,7 @@ export function PipelineDeleteDialog({
 
         <DialogDescription className="text-gray-300 py-4">
           Are you sure you want to delete{" "}
-          <span className="text-white font-medium">"{pipelineName}"</span>? This action cannot be
+          <span className="text-white font-medium">&quot;{pipelineName}&quot;</span>? This action cannot be
           undone and will delete all associated stages.
         </DialogDescription>
 

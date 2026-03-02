@@ -4,6 +4,8 @@ Dockerfile
 npm-debug.log
 README.md
 .next
+apps/web/.next
 .git
 artifacts/infographic-renderer/node_modules
-artifacts/react-renderer/node_modules
+apps/web/node_modules
+packages/react-renderer/node_modules
