@@ -52,7 +52,7 @@ export const PipelineCard = ({ pipeline, index }: PipelineCardProps) => {
               className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-500/20"
             >
               <Play className="h-4 w-4" />
-              Experience
+              体验
             </Link>
             
             <Link
@@ -60,7 +60,7 @@ export const PipelineCard = ({ pipeline, index }: PipelineCardProps) => {
               className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-gray-300 transition-all hover:border-white/20 hover:bg-white/10 hover:text-white"
             >
               <Settings className="h-4 w-4" />
-              Configure
+              配置
             </Link>
           </div>
         </div>

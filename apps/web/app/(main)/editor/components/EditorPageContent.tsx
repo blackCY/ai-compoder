@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { EditorLayout, EditorFloatingDock } from "./index";
 import type { EditorFloatingDockRef } from "./index";
 import type { PipelineId } from "lib/store/pipeline/types";
+import { BackgroundElements } from "../../home/components/BackgroundElements";
 
 interface ContentProps {
   name?: PipelineId;
@@ -16,11 +17,24 @@ export function EditorPageContent({ name, id }: ContentProps) {
 
   return (
     <div
-      className="min-h-screen bg-[#0a0b0e] text-[#e1e3e8] font-['Syne',sans-serif] overflow-hidden"
-      style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E")`,
-      }}
+      className="relative min-h-screen bg-[#0a0b0e] text-[#e1e3e8] font-['Syne',sans-serif] overflow-hidden"
     >
+      {/* 桌面端完整背景 */}
+      <div className="hidden md:block absolute inset-0 pointer-events-none">
+        <BackgroundElements />
+      </div>
+
+      {/* 移动端简化背景 */}
+      <div className="md:hidden absolute inset-0 bg-gradient-to-br from-emerald-950 to-slate-950 opacity-80 pointer-events-none" />
+
+      {/* 保留原有噪点纹理以增强深度感 */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E")`,
+        }}
+      />
+
       {/* Main Layout Grid */}
       <EditorLayout
         pipelineName={name!}

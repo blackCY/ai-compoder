@@ -16,7 +16,7 @@ export const terminalVariants = cva(
 );
 
 export const commandBarVariants = cva(
-  'group w-full h-full flex items-center px-6 bg-gradient-to-br from-gray-900/90 via-gray-900/85 to-gray-800/90 backdrop-blur-xl border border-gray-700/60 shadow-2xl transition-all duration-300',
+  'group w-full h-full flex items-center px-6 bg-gradient-to-br from-emerald-950/60 via-emerald-950/50 to-slate-900/60 backdrop-blur-xl border border-emerald-500/20 shadow-xl shadow-emerald-500/10 transition-all duration-300',
   {
     variants: {
       terminalVisible: {

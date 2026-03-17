@@ -18,7 +18,7 @@ export interface EditorFloatingDockProps {
 }
 
 export const EditorFloatingDock = forwardRef<EditorFloatingDockRef, EditorFloatingDockProps>(
-  ({ pipelineId, pipelineName, disabled = false, placeholder = "创建一个响应式的用户配置文件卡片组件" }, ref) => {
+  ({ pipelineId, pipelineName, disabled = false, placeholder = "输入需求，例如“创建一个登录页面组件“" }, ref) => {
     const { run } = usePipeline(pipelineName, pipelineId);
     const { isRunning } = usePipelineState(pipelineName);
     const [showTerminal, setShowTerminal] = useState(false);

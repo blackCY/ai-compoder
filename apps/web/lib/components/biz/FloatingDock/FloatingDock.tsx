@@ -47,6 +47,7 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({
                 ease: [0.25, 0.46, 0.45, 0.94],
               }}
               className="relative z-[10] w-[600px] max-w-[90%]"
+              style={{ willChange: 'transform, opacity', transform: 'translateZ(0)' }}
             >
               {terminalOutput}
             </motion.div>
@@ -66,6 +67,7 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({
             ease: "easeInOut",
             delay: isTerminalVisible ? 0.3 : 0
           }}
+          style={{ willChange: 'transform, opacity', transform: 'translateZ(0)' }}
         />
 
         {/* Floating Dock Command Bar */}
@@ -74,6 +76,7 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({
           initial={{ y: "120%", opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, ease: [0.34, 1.56, 0.64, 1], delay: 0.5 }}
+          style={{ willChange: 'transform, opacity', transform: 'translateZ(0)' }}
         >
           <motion.div
             className="h-16 relative z-[20]"
@@ -115,13 +118,13 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({
                 onKeyDown={handleCommandSubmit}
                 placeholder={placeholder}
                 disabled={disabled}
-                className="flex-1 bg-transparent border-none outline-none text-base text-gray-100 placeholder-gray-500/70 transition-all duration-200 focus:placeholder-gray-500/50"
+                className="flex-1 bg-gray-900/50 border border-emerald-500/20 rounded-lg px-4 py-2 outline-none text-base text-gray-100 placeholder-gray-500/70 transition-all duration-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:placeholder-gray-500/50"
                 autoComplete="off"
               />
 
               {/* Status Indicator */}
-              <motion.div 
-                className="flex items-center gap-1.5 text-xs text-gray-400 bg-gray-800/50 px-3 py-1.5 rounded-lg border border-gray-700/50 hover:border-emerald-500/30 hover:bg-gray-800/70 transition-all duration-200"
+              <motion.div
+                className="flex items-center gap-1.5 text-xs text-white bg-gradient-to-r from-emerald-500 to-cyan-500 px-3 py-1.5 rounded-lg border border-emerald-500/30 hover:from-emerald-600 hover:to-cyan-600 transition-all duration-200 shadow-lg shadow-emerald-500/20"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
