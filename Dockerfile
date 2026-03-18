@@ -24,15 +24,23 @@ RUN \
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+
+# Copy package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/web/package.json ./apps/web/
+COPY packages/react-renderer/package.json ./packages/react-renderer/
+
+# Install dependencies
+RUN corepack enable pnpm && pnpm install --frozen-lockfile
+
+# Copy source code
 COPY . .
 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED=1
+# Set environment variables for build
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN corepack enable pnpm && pnpm --filter @ai-compoder/web run build
+RUN pnpm --filter @ai-compoder/web run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
