@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  ai-compoder:
+    image: ghcr.io/blackcy/ai-compoder:latest
+    container_name: ai-compoder
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      # 添加其他需要的环境变量
+      # - API_KEY=your_api_key
+    # 如果需要持久化数据
+    # volumes:
+    #   - ./data:/app/data
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
