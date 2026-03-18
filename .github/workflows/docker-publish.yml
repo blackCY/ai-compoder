@@ -11,6 +11,8 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  # Opt into Node.js 24 for GitHub Actions (required starting June 2026)
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
@@ -18,6 +20,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      attestations: write
       id-token: write
 
     steps:
