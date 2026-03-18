@@ -126,7 +126,7 @@ export function ResourceEditor({ value, onChange, disabled }: ResourceEditorProp
                 Close Editor
               </Button>
             </div>
-            <div className="overflow-hidden rounded-xl border border-emerald-500/20 bg-black/40">
+            <div className="overflow-hidden rounded-xl border border-emerald-500/20 bg-emerald-950/30">
               <Editor
                 height="300px"
                 defaultLanguage="json"
@@ -153,7 +153,7 @@ export function ResourceEditor({ value, onChange, disabled }: ResourceEditorProp
 
         {/* Adding form at the top */}
         {isAdding && (
-          <div className="p-4 rounded-xl bg-emerald-500/[0.03] border border-emerald-500/20 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300 max-w-[608px]">
+          <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/20 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300 max-w-[608px]">
             <div className="grid gap-4">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest pl-1">
@@ -163,7 +163,7 @@ export function ResourceEditor({ value, onChange, disabled }: ResourceEditorProp
                   value={newItem.key}
                   onChange={e => setNewItem(prev => ({ ...prev, key: e.target.value }))}
                   placeholder="e.g., product_catalog"
-                  className="bg-black/40 border-white/10 h-9 text-sm text-white focus:ring-emerald-500/20"
+                  className="bg-emerald-950/20 border-emerald-500/10 h-9 text-sm text-white focus:ring-emerald-500/20 focus:border-emerald-500/30"
                 />
               </div>
               <div className="space-y-2">
@@ -174,7 +174,7 @@ export function ResourceEditor({ value, onChange, disabled }: ResourceEditorProp
                   value={newItem.api}
                   onChange={e => setNewItem(prev => ({ ...prev, api: e.target.value }))}
                   placeholder="Complete documentation of resource"
-                  className="bg-black/40 border-white/10 h-9 text-sm text-white focus:ring-emerald-500/20"
+                  className="bg-emerald-950/20 border-emerald-500/10 h-9 text-sm text-white focus:ring-emerald-500/20 focus:border-emerald-500/30"
                 />
               </div>
               <div className="space-y-2">
@@ -185,7 +185,7 @@ export function ResourceEditor({ value, onChange, disabled }: ResourceEditorProp
                   value={newItem.description}
                   onChange={e => setNewItem(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="What is this resource used for?"
-                  className="bg-black/40 border-white/10 min-h-[80px] text-sm text-white focus:ring-emerald-500/20 resize-none"
+                  className="bg-emerald-950/20 border-emerald-500/10 min-h-[80px] text-sm text-white focus:ring-emerald-500/20 focus:border-emerald-500/30 resize-none"
                 />
               </div>
             </div>
@@ -202,7 +202,7 @@ export function ResourceEditor({ value, onChange, disabled }: ResourceEditorProp
                 size="sm"
                 disabled={!newItem.key.trim() || !newItem.api.trim()}
                 onClick={handleAdd}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white"
+                className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white"
               >
                 Add Resource
               </Button>
@@ -211,7 +211,7 @@ export function ResourceEditor({ value, onChange, disabled }: ResourceEditorProp
         )}
 
         {resourceKeys.length === 0 && !isAdding && !isImporting ? (
-          <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-8 text-center group/resource hover:bg-white/[0.04] transition-colors max-w-[608px]">
+          <div className="rounded-2xl border border-dashed border-emerald-500/10 bg-emerald-950/10 p-8 text-center group/resource hover:bg-emerald-950/20 transition-colors max-w-[608px]">
             <p className="text-gray-400 font-medium">No resources attached</p>
             <p className="text-xs text-gray-500 mt-2">Add external APIs or data sources for this stage</p>
           </div>
@@ -223,9 +223,9 @@ export function ResourceEditor({ value, onChange, disabled }: ResourceEditorProp
                   onClick={() => toggleExpand(key)}
                   className={cn(
                     "group relative flex items-start gap-4 p-4 rounded-xl transition-all cursor-pointer border",
-                    expandedKey === key 
-                      ? "bg-white/[0.05] border-emerald-500/30" 
-                      : "bg-white/[0.03] border-white/10 hover:border-emerald-500/20 hover:bg-white/[0.04]"
+                    expandedKey === key
+                      ? "bg-emerald-950/30 border-emerald-500/40"
+                      : "bg-emerald-950/20 border-emerald-500/10 hover:border-emerald-500/30 hover:bg-emerald-950/30"
                   )}
                 >
                   <div className="flex-1 min-w-0 space-y-1">
@@ -274,13 +274,13 @@ export function ResourceEditor({ value, onChange, disabled }: ResourceEditorProp
 
                 {/* Expanded Detail View */}
                 {expandedKey === key && (
-                  <div className="mx-2 p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                  <div className="mx-2 p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/10 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
                     <div className="grid gap-3">
                       <div className="space-y-1">
                         <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest pl-1">
                           Full Api
                         </span>
-                        <div className="p-2 rounded bg-black/40 border border-white/5 text-[11px] font-mono text-blue-400/80 break-all">
+                        <div className="p-2 rounded bg-emerald-950/30 border border-emerald-500/10 text-[11px] font-mono text-blue-400/80 break-all">
                           {resources[key].api}
                         </div>
                       </div>
@@ -288,7 +288,7 @@ export function ResourceEditor({ value, onChange, disabled }: ResourceEditorProp
                         <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest pl-1">
                           Full Description
                         </span>
-                        <div className="p-2 rounded bg-black/40 border border-white/5 text-xs text-gray-300 leading-relaxed whitespace-pre-wrap">
+                        <div className="p-2 rounded bg-emerald-950/30 border border-emerald-500/10 text-xs text-gray-300 leading-relaxed whitespace-pre-wrap">
                           {resources[key].description || "No description provided"}
                         </div>
                       </div>

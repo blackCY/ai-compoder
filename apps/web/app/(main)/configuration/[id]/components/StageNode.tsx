@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "lib/ui/tooltip";
 interface StageNodeProps {
   data: Stage & {
     pipelineId: string;
+    runnable?: boolean;
     onClick: () => void;
     onDelete: (e: React.MouseEvent) => void;
   };
@@ -91,24 +92,26 @@ export function StageNode({ data }: StageNodeProps) {
                 <Settings className="h-3.5 w-3.5" />
               </button>
             </TooltipTrigger>
-            <TooltipContent>Open Configure Stage</TooltipContent>
+            <TooltipContent>Open Configure</TooltipContent>
           </Tooltip>
 
           {/* Run Stage Button */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={e => {
-                  e.stopPropagation();
-                  setIsDialogOpen(true);
-                }}
-                className="flex h-7 min-w-7 px-2 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20 shadow-[0_0_10px_-2px_rgba(16,185,129,0.3)] transition-all hover:scale-105 active:scale-95 cursor-pointer"
-              >
-                <Play className="h-3.5 w-3.5" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>Run Stage</TooltipContent>
-          </Tooltip>
+          {data.runnable && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    setIsDialogOpen(true);
+                  }}
+                  className="flex h-7 min-w-7 px-2 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20 shadow-[0_0_10px_-2px_rgba(16,185,129,0.3)] transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                >
+                  <Play className="h-3.5 w-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Run Stage</TooltipContent>
+            </Tooltip>
+          )}
 
           {/* Delete Button */}
           <Tooltip>

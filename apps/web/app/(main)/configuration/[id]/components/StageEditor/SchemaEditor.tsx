@@ -63,7 +63,7 @@ export function SchemaEditor({ value, onChange, disabled }: SchemaEditorProps) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-gray-300">Schema (Optional)</label>
+        <label className="text-sm font-medium text-emerald-400/80">Schema (Optional)</label>
         <div className="flex gap-2">
           {hasSchema && (
             <Button
@@ -92,7 +92,7 @@ export function SchemaEditor({ value, onChange, disabled }: SchemaEditorProps) {
 
       {hasSchema && (
         <>
-          <div className="overflow-hidden rounded-lg border border-white/10">
+          <div className="overflow-hidden rounded-lg border border-emerald-500/10 bg-emerald-950/20">
             <Editor
               height="300px"
               defaultLanguage="json"
@@ -119,7 +119,7 @@ export function SchemaEditor({ value, onChange, disabled }: SchemaEditorProps) {
       )}
 
       {!hasSchema && (
-        <div className="rounded-lg border border-dashed border-white/10 bg-white/[0.02] p-8 text-center">
+        <div className="rounded-lg border border-dashed border-emerald-500/10 bg-emerald-950/10 p-8 text-center">
           <p className="text-sm text-gray-500">No schema defined</p>
         </div>
       )}

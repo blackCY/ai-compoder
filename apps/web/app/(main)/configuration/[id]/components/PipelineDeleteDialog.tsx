@@ -43,20 +43,19 @@ export function PipelineDeleteDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="sm:max-w-md bg-gradient-to-br from-gray-900 to-black border-white/10">
+      <DialogContent className="bg-[#0a0a0a]/95 border-emerald-500/10 text-white sm:max-w-[425px] backdrop-blur-xl">
         <DialogHeader>
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-red-500/10 text-red-400">
               <AlertTriangle className="h-5 w-5" />
             </div>
-            <DialogTitle className="text-xl font-semibold text-white">Delete Pipeline</DialogTitle>
+            <DialogTitle className="text-xl font-semibold text-white">删除配置</DialogTitle>
           </div>
         </DialogHeader>
 
         <DialogDescription className="text-gray-300 py-4">
-          Are you sure you want to delete{" "}
-          <span className="text-white font-medium">&quot;{pipelineName}&quot;</span>? This action cannot be
-          undone and will delete all associated stages.
+          确定要删除 <span className="text-white font-medium">&quot;{pipelineName}&quot;</span>
+          吗？此操作无法撤销，将同时删除所有关联的阶段。
         </DialogDescription>
 
         <DialogFooter className="bg-black/20 -mx-6 -mb-6 p-6 mt-0">
@@ -66,7 +65,7 @@ export function PipelineDeleteDialog({
             className="text-gray-400 hover:text-white"
             disabled={isDeleting}
           >
-            Cancel
+            取消
           </Button>
           <Button
             onClick={handleConfirm}
@@ -76,12 +75,12 @@ export function PipelineDeleteDialog({
             {isDeleting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Deleting...
+                删除中...
               </>
             ) : (
               <>
                 <Trash2 className="mr-2 h-4 w-4" />
-                Delete Pipeline
+                确认删除
               </>
             )}
           </Button>

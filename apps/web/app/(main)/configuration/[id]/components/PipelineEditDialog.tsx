@@ -38,7 +38,7 @@ export function PipelineEditDialog({
 
   const handleSave = async () => {
     if (!name.trim()) {
-      toast.error("Pipeline name is required");
+      toast.error("配置名称不能为空");
       return;
     }
 
@@ -51,11 +51,11 @@ export function PipelineEditDialog({
         },
       });
 
-      toast.success("Pipeline updated successfully");
+      toast.success("配置已更新");
       onSuccess?.(name, description || null);
       onClose();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to update pipeline");
+      toast.error(error instanceof Error ? error.message : "更新配置失败");
     }
   };
 
@@ -63,37 +63,37 @@ export function PipelineEditDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="sm:max-w-lg bg-gradient-to-br from-gray-900 to-black border-white/10">
+      <DialogContent className="bg-[#0a0a0a]/95 border-emerald-500/10 text-white sm:max-w-[425px] backdrop-blur-xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-white">Edit Pipeline</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-white">编辑配置</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">Pipeline Name</label>
+            <label className="text-sm font-medium text-gray-300">配置名称</label>
             <Input
               value={name}
               onChange={e => setName(e.target.value)}
               className="bg-white/5 border-white/10 text-white"
-              placeholder="Enter pipeline name"
+              placeholder="输入配置名称"
               autoFocus
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">Description</label>
+            <label className="text-sm font-medium text-gray-300">描述</label>
             <Textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
               className="bg-white/5 border-white/10 text-white min-h-[120px]"
-              placeholder="Enter pipeline description"
+              placeholder="输入配置描述"
             />
           </div>
         </div>
 
         <DialogFooter className="bg-black/20 -mx-6 -mb-6 p-6 mt-0">
           <Button variant="ghost" onClick={onClose} className="text-gray-400 hover:text-white">
-            Cancel
+            取消
           </Button>
           <Button
             onClick={handleSave}
@@ -103,10 +103,10 @@ export function PipelineEditDialog({
             {isSaving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving
+                保存中...
               </>
             ) : (
-              "Save Changes"
+              "保存"
             )}
           </Button>
         </DialogFooter>

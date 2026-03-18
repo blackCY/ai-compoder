@@ -88,6 +88,7 @@ export function StageFlowCanvas({
       data: {
         ...stage,
         pipelineId,
+        runnable: index !== stages.length - 1,
         onClick: () => onStageClickRef.current(stage),
         onDelete: (e: React.MouseEvent) => {
           e.stopPropagation();
@@ -110,7 +111,7 @@ export function StageFlowCanvas({
   }, [stages, pipelineId, setNodes, setEdges]);
 
   return (
-    <div className="relative h-full w-full rounded-xl border border-white/10 bg-gradient-to-br from-gray-900 to-black overflow-hidden">
+    <div className="relative h-full w-full rounded-xl border border-emerald-500/10 bg-emerald-950/20 backdrop-blur-sm shadow-xl shadow-emerald-500/5 overflow-hidden">
       <StageToolbar onAddStage={onAddStage} />
 
       <ReactFlow
@@ -148,13 +149,12 @@ export function StageFlowCanvas({
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={!!stageToDelete} onOpenChange={() => !isDeleting && setStageToDelete(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white sm:max-w-[425px]">
+        <DialogContent className="bg-[#0a0a0a]/95 border-emerald-500/10 text-white sm:max-w-[425px] backdrop-blur-xl">
           <DialogHeader>
-            <DialogTitle>Delete Stage</DialogTitle>
+            <DialogTitle>删除阶段</DialogTitle>
             <DialogDescription className="text-gray-400">
-              Are you sure you want to delete stage{" "}
-              <span className="font-semibold text-white">{stageToDelete?.stage_id}</span>? This
-              action cannot be undone.
+              确定要删除阶段 <span className="font-semibold text-white">{stageToDelete?.stage_id}</span>
+              吗？此操作无法撤销。
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-6 flex gap-2">
@@ -164,7 +164,7 @@ export function StageFlowCanvas({
               disabled={isDeleting}
               className="hover:bg-white/5 text-gray-400 hover:text-white"
             >
-              Cancel
+              取消
             </Button>
             <Button
               variant="destructive"
@@ -175,10 +175,10 @@ export function StageFlowCanvas({
               {isDeleting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
+                  删除中...
                 </>
               ) : (
-                "Delete Stage"
+                "确认删除"
               )}
             </Button>
           </DialogFooter>
