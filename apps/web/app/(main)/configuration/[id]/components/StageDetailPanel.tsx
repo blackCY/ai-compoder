@@ -79,8 +79,8 @@ export function StageDetailPanel({
 
           {/* Schema */}
           <SchemaEditor
-            value={formData.schema}
-            onChange={val => setFormData(prev => ({ ...prev, schema: val }))}
+            value={formData.schema ?? null}
+            onChange={val => setFormData(prev => ({ ...prev, schema: val }) as Partial<Stage>)}
             disabled={isSaving}
           />
 

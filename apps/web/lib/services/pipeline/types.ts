@@ -1,4 +1,6 @@
-import { type JsonSchema, ModelMessage } from "ai";
+import { type ModelMessage } from "ai";
+
+export type JsonSchema = Record<string, unknown>;
 
 export interface PipelineStreamParams {
   messages: ModelMessage[];
