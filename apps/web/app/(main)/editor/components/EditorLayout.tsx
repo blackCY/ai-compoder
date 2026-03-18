@@ -140,7 +140,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({ pipelineName, onErro
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
     >
       {/* Header */}
-      <header className="col-span-full bg-emerald-950/40 border-b border-emerald-500/20 backdrop-blur-md flex items-center justify-between px-5 transition-all duration-200">
+      <header className="relative z-[1000] col-span-full bg-emerald-950/40 border-b border-emerald-500/20 backdrop-blur-md flex items-center justify-between px-5 transition-all duration-200">
         <span className="font-bold tracking-wide bg-gradient-to-r from-emerald-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
           AI Compoder<span className="text-emerald-400">.IDE</span>
         </span>

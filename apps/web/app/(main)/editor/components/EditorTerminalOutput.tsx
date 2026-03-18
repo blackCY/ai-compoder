@@ -71,7 +71,7 @@ export const EditorTerminalOutput: React.FC<EditorTerminalOutputProps> = ({
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400 mr-2" />
                 <span className="text-emerald-400 font-semibold text-xs">
-                  Analyzing Requirements...
+                  正在分析需求...
                 </span>
               </>
             )}
@@ -88,7 +88,7 @@ export const EditorTerminalOutput: React.FC<EditorTerminalOutputProps> = ({
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="text-green-400 font-semibold text-xs">Analysis Complete</span>
+                <span className="text-green-400 font-semibold text-xs">设计完成，准备生成代码</span>
               </>
             )}
             {status === "error" && (
@@ -104,7 +104,7 @@ export const EditorTerminalOutput: React.FC<EditorTerminalOutputProps> = ({
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="text-red-400 font-semibold text-xs">Analysis Failed</span>
+                <span className="text-red-400 font-semibold text-xs">设计失败</span>
               </>
             )}
             {status === "idle" && (

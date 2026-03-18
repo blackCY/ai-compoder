@@ -20,15 +20,20 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({
   const handleCommandSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if ((e.key === "Enter" && !e.shiftKey) || (e.key === "Enter" && e.ctrlKey)) {
       e.preventDefault();
-      if (!command.trim() || disabled) return;
+      executeCommand();
+    }
+  };
 
-      const userInput = command.trim();
-      setCommand("");
+  // Execute command (shared by keyboard and click)
+  const executeCommand = () => {
+    if (!command.trim() || disabled) return;
 
-      // Call external onGenerate callback
-      if (onGenerate) {
-        onGenerate(userInput);
-      }
+    const userInput = command.trim();
+    setCommand("");
+
+    // Call external onGenerate callback
+    if (onGenerate) {
+      onGenerate(userInput);
     }
   };
 
@@ -123,14 +128,17 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({
               />
 
               {/* Status Indicator */}
-              <motion.div
-                className="flex items-center gap-1.5 text-xs text-white bg-gradient-to-r from-emerald-500 to-cyan-500 px-3 py-1.5 rounded-lg border border-emerald-500/30 hover:from-emerald-600 hover:to-cyan-600 transition-all duration-200 shadow-lg shadow-emerald-500/20"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              <motion.button
+                type="button"
+                onClick={executeCommand}
+                disabled={!command.trim() || disabled}
+                className="flex items-center gap-1.5 text-xs text-white bg-gradient-to-r from-emerald-500 to-cyan-500 px-3 py-1.5 rounded-lg border border-emerald-500/30 hover:from-emerald-600 hover:to-cyan-600 transition-all duration-200 shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                whileHover={{ scale: !command.trim() || disabled ? 1 : 1.05 }}
+                whileTap={{ scale: !command.trim() || disabled ? 1 : 0.95 }}
               >
                 <kbd className="font-mono font-semibold">⏎</kbd>
                 <span>ENTER</span>
-              </motion.div>
+              </motion.button>
             </div>
           </motion.div>
         </motion.div>

@@ -70,7 +70,7 @@ export function UsagePanel({ pipelineName }: { pipelineName: PipelineId }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 w-80 bg-[#1a1b1e] border border-[#23252b] rounded-lg p-4 shadow-xl z-50"
+            className="absolute right-0 top-full mt-2 w-80 bg-[#1a1b1e] border border-[#23252b] rounded-lg p-4 shadow-xl z-[1001]"
           >
             <h3 className="text-sm font-medium mb-3 text-[#c1c2c5]">Token Usage</h3>
 
