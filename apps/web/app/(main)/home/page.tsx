@@ -4,9 +4,13 @@ import { BackgroundElements } from "./components/BackgroundElements";
 import { Navigation } from "./components/Navigation";
 import { HeroSection } from "./components/HeroSection";
 import { FeaturesSection } from "./components/FeaturesSection";
-import { PipelineGridNoSSR } from "./components/PipelineGrid";
+import { PipelineGrid } from "./components/PipelineGrid";
+import { getPipelines } from "actions/pipeline/getPipelines";
 
-export default function Home({ className }: HomeProps) {
+export default async function Home({ className }: HomeProps) {
+  // Fetch pipelines server-side for Full Route Cache
+  const pipelines = await getPipelines();
+
   return (
     <main className={cn("min-h-screen bg-[#0a0a0a] relative overflow-hidden", className)}>
       <BackgroundElements />
@@ -25,7 +29,7 @@ export default function Home({ className }: HomeProps) {
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">选择一个 pipeline 开始您的 AI 开发之旅</p>
         </div>
-        <PipelineGridNoSSR />
+        <PipelineGrid initialPipelines={pipelines} />
       </section>
     </main>
   );

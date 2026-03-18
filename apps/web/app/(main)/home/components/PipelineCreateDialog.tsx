@@ -13,7 +13,8 @@ import {
 import { Button } from "lib/ui/button";
 import { Input } from "lib/ui/input";
 import { Textarea } from "lib/ui/textarea";
-import { useCreatePipeline } from "lib/serverStore/hooks/usePipelines";
+import { createPipelineAction } from "actions/pipeline/getPipelines";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 interface PipelineCreateDialogProps {
@@ -24,29 +25,40 @@ interface PipelineCreateDialogProps {
 export function PipelineCreateDialog({ open, onOpenChange }: PipelineCreateDialogProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [isPending, setIsPending] = useState(false);
   const router = useRouter();
-  const createPipeline = useCreatePipeline();
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
+    setIsPending(true);
     try {
-      const result = await createPipeline.mutateAsync({
+      const result = await createPipelineAction({
         name: name.trim(),
-        description: description.trim(),
+        description: description.trim() || undefined,
       });
-      
+
+      if (!result) {
+        throw new Error("Failed to create pipeline");
+      }
+
       toast.success("pipeline 创建成功");
       onOpenChange(false);
       setName("");
       setDescription("");
-      
+
+      // Invalidate and refetch pipelines query
+      queryClient.invalidateQueries({ queryKey: ["pipelines"] });
+
       // 跳转到配置页面
       router.push(`/configuration/${result.id}`);
     } catch (error) {
       console.error("Failed to create pipeline:", error);
       toast.error("创建失败，请稍后重试");
+    } finally {
+      setIsPending(false);
     }
   };
 
@@ -98,10 +110,10 @@ export function PipelineCreateDialog({ open, onOpenChange }: PipelineCreateDialo
             </Button>
             <Button
               type="submit"
-              disabled={createPipeline.isPending || !name.trim()}
+              disabled={isPending || !name.trim()}
               className="bg-emerald-500 hover:bg-emerald-600 text-white border-none"
             >
-              {createPipeline.isPending ? "创建中..." : "立即创建"}
+              {isPending ? "创建中..." : "立即创建"}
             </Button>
           </DialogFooter>
         </form>

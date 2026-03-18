@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ReactFlowProvider } from "@xyflow/react";
 import { Settings, Play } from "lucide-react";
 import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "lib/ui/tooltip";
 
 import { usePipeline, useStages, useUpdateStage, useCreateStage } from "lib/serverStore";
 import { Stage } from "lib/services/pipeline/types";
@@ -117,26 +118,54 @@ export function ConfigurationPageContent({ pipelineId }: ContentProps) {
               </div>
             </div>
             <div className="flex items-center gap-4 text-xs text-gray-500">
-              <div className="flex items-center gap-1.5">
-                <div className="h-5 px-1.5 flex items-center justify-center rounded bg-blue-500/10 text-[10px] font-medium text-blue-400 ring-1 ring-blue-500/20">resource</div>
-                <span>资源</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="h-5 px-1.5 flex items-center justify-center rounded bg-purple-500/10 text-[10px] font-medium text-purple-400 ring-1 ring-purple-500/20">schema</div>
-                <span>输出结构</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="h-5 w-5 flex items-center justify-center rounded bg-white/5 text-gray-300 ring-1 ring-white/10">
-                  <Settings className="h-3 w-3" />
-                </div>
-                <span>查看配置</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="h-5 w-5 flex items-center justify-center rounded bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20">
-                  <Play className="h-3 w-3" />
-                </div>
-                <span>运行</span>
-              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-5 px-1.5 flex items-center justify-center rounded bg-blue-500/10 text-[10px] font-medium text-blue-400 ring-1 ring-blue-500/20">resource</div>
+                    <span>资源</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>上传的私有资源，例如私有组件库</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-5 px-1.5 flex items-center justify-center rounded bg-purple-500/10 text-[10px] font-medium text-purple-400 ring-1 ring-purple-500/20">schema</div>
+                    <span>输出结构</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>定义 AI 输出什么结构，例如输出的代码是什么样</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-5 w-5 flex items-center justify-center rounded bg-white/5 text-gray-300 ring-1 ring-white/10">
+                      <Settings className="h-3 w-3" />
+                    </div>
+                    <span>查看配置</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>查看和编辑阶段配置</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-5 w-5 flex items-center justify-center rounded bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20">
+                      <Play className="h-3 w-3" />
+                    </div>
+                    <span>运行</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>运行当前阶段</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
           <div className="h-[600px] rounded-2xl border border-emerald-500/10 overflow-hidden bg-emerald-950/20 backdrop-blur-sm shadow-xl shadow-emerald-500/5">

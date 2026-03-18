@@ -22,8 +22,8 @@ export function ConfigurationHeader({ pipeline }: ConfigurationHeaderProps) {
       {/* Left: Title Section with Back */}
       <div className="flex items-center gap-4 flex-1">
         <button
-          onClick={() => router.push("/")}
-          className="group flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white transition-all"
+          onClick={() => router.back()}
+          className="group flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white transition-all cursor-pointer"
         >
           <ArrowLeft className="h-5 w-5 group-hover:-translate-x-0.5 transition-transform" />
         </button>
@@ -55,20 +55,20 @@ export function ConfigurationHeader({ pipeline }: ConfigurationHeaderProps) {
           variant="ghost"
           size="sm"
           onClick={() => setIsEditDialogOpen(true)}
-          className="h-9 px-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+          className="h-9 px-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all cursor-pointer"
         >
           <Edit2 className="h-4 w-4" />
-          <span className="hidden sm:inline">Edit</span>
+          <span className="hidden sm:inline">编辑</span>
         </Button>
 
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setIsDeleteDialogOpen(true)}
-          className="h-9 px-3 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
+          className="h-9 px-3 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all cursor-pointer"
         >
           <Trash2 className="h-4 w-4" />
-          <span className="hidden sm:inline">Delete</span>
+          <span className="hidden sm:inline">删除</span>
         </Button>
       </div>
 

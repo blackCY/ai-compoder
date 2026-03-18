@@ -10,6 +10,8 @@ import { usePipelineStage, useStageUpdate } from "lib/store/pipeline/hooks";
 import type { GeneratedFileName, GenerateCodeOutput, PipelineId } from "lib/store/pipeline/types";
 import type { FileMap } from "react-renderer";
 import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 /**
  * 将 GenerateCodeOutput 转换为 FileMap
@@ -35,6 +37,7 @@ export interface EditorLayoutProps {
 }
 
 export const EditorLayout: React.FC<EditorLayoutProps> = ({ pipelineName, onError, onUnsaveChange }) => {
+  const router = useRouter();
   const [selectedFileName, setSelectedFileName] = useState<GeneratedFileName | null>(null);
   const { final, snapshot, status } = usePipelineStage(pipelineName, "generate-code");
 
@@ -141,10 +144,20 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({ pipelineName, onErro
     >
       {/* Header */}
       <header className="relative z-[1000] col-span-full bg-emerald-950/40 border-b border-emerald-500/20 backdrop-blur-md flex items-center justify-between px-5 transition-all duration-200">
+        <button
+          onClick={() => router.back()}
+          className="group flex items-center gap-2 text-gray-400 hover:text-emerald-400 transition-colors duration-200 cursor-pointer"
+          title="返回"
+        >
+          <ArrowLeft className="h-5 w-5 group-hover:-translate-x-0.5 transition-transform duration-200" />
+          <span className="text-sm">返回</span>
+        </button>
         <span className="font-bold tracking-wide bg-gradient-to-r from-emerald-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
           AI Compoder<span className="text-emerald-400">.IDE</span>
         </span>
-        {useMemo(() => <UsagePanel pipelineName={pipelineName} />, [pipelineName])}
+        <div className="w-20 flex justify-end">
+          {useMemo(() => <UsagePanel pipelineName={pipelineName} />, [pipelineName])}
+        </div>
       </header>
 
       {/* Sidebar */}
