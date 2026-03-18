@@ -25,6 +25,16 @@ RUN \
 FROM base AS builder
 WORKDIR /app
 
+# Declare build arguments for Supabase configuration
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG SUPABASE_SERVICE_ROLE_KEY
+
+# Set environment variables for build
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+ENV SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+
 # Copy package files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json ./apps/web/
@@ -35,10 +45,6 @@ RUN corepack enable pnpm && pnpm install --frozen-lockfile
 
 # Copy source code
 COPY . .
-
-# Set environment variables for build
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN pnpm --filter @ai-compoder/web run build
 
