@@ -52,9 +52,15 @@ RUN pnpm --filter @ai-compoder/web run build
 FROM base AS runner
 WORKDIR /app
 
+# Declare build arguments for Supabase configuration (runtime)
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG SUPABASE_SERVICE_ROLE_KEY
+
+# Set environment variables for runtime
 ENV NODE_ENV=production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+ENV SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
