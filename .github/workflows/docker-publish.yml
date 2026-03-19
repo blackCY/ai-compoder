@@ -62,5 +62,13 @@ jobs:
           cache-to: type=gha,mode=max
           provenance: false
           build-args: |
+            AI_MODEL=${{ secrets.AI_MODEL }}
+            AI_KEY=${{ secrets.AI_KEY }}
+            AI_PROVIDER=${{ secrets.AI_PROVIDER }}
+            AI_BASE_URL=${{ secrets.AI_BASE_URL }}
+            AI_MODEL_WITH_STRUCTURE=${{ secrets.AI_MODEL_WITH_STRUCTURE }}
+            AI_KEY_WITH_STRUCTURE=${{ secrets.AI_KEY_WITH_STRUCTURE }}
+            AI_PROVIDER_WITH_STRUCTURE=${{ secrets.AI_PROVIDER_WITH_STRUCTURE }}
+            AI_BASE_URL_WITH_STRUCTURE=${{ secrets.AI_BASE_URL_WITH_STRUCTURE }}
             NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
             SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
