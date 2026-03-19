@@ -23,7 +23,7 @@ export function StageToolbar({ onAddStage }: StageToolbarProps) {
         className="h-9 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-lg shadow-emerald-900/20 transition-all active:scale-95"
       >
         <Plus className="mr-2 h-4 w-4" />
-        Add Stage
+        添加节点
       </Button>
 
       <div className="w-px h-5 bg-white/10 mx-1" />

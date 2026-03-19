@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "lib/ui/card";
-import { Code, Layers, Zap, Terminal } from "lucide-react";
+import { Code, Layers, Zap, Eye } from "lucide-react";
 
 interface Feature {
   icon: typeof Code;
@@ -24,7 +24,7 @@ const features: Feature[] = [
   {
     icon: Code,
     title: "智能代码生成",
-    description: "基于 AI 的智能代码理解和生成，准确把握业务需求，生成高质量代码",
+    description: "基于 AI 的业务组件智能代码理解和生成，准确把握业务需求，生成高质量代码",
     gradientColors: {
       from: "from-emerald-500",
       to: "to-emerald-700",
@@ -58,6 +58,24 @@ const features: Feature[] = [
     }
   },
   {
+    icon: Eye,
+    title: "实时编辑与查看",
+    description: "AI 生成的代码可实时编辑调整，保存后即时预览效果，快速迭代优化",
+    gradientColors: {
+      from: "from-purple-500",
+      to: "to-purple-700",
+      shadow: "shadow-purple-500/40"
+    },
+    borderColors: {
+      border: "border-purple-500/20",
+      bg: "from-slate-900/95 to-purple-950/30"
+    },
+    hoverColors: {
+      text: "text-purple-300",
+      bg: "hover:shadow-purple-500/30"
+    }
+  },
+  {
     icon: Zap,
     title: "流式输出",
     description: "实时代码生成，流畅的交互体验，边生成边展示，提升开发效率",
@@ -73,24 +91,6 @@ const features: Feature[] = [
     hoverColors: {
       text: "text-teal-300",
       bg: "hover:shadow-teal-500/30"
-    }
-  },
-  {
-    icon: Terminal,
-    title: "类型安全",
-    description: "完整的 TypeScript 支持，类型安全的开发环境，减少运行时错误",
-    gradientColors: {
-      from: "from-purple-500",
-      to: "to-purple-700",
-      shadow: "shadow-purple-500/40"
-    },
-    borderColors: {
-      border: "border-purple-500/20",
-      bg: "from-slate-900/95 to-purple-950/30"
-    },
-    hoverColors: {
-      text: "text-purple-300",
-      bg: "hover:shadow-purple-500/30"
     }
   }
 ];

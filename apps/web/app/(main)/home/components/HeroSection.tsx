@@ -38,7 +38,7 @@ export const HeroSection = () => {
             <br className="hidden sm:block" />
             <span className="text-emerald-400 font-semibold">快速构建高质量的业务页面</span>，
             <br className="hidden sm:block" />
-            体验流式代码生成，享受类型安全的开发环境。
+            体验实时编辑，快速查看预览效果。
           </p>
         </div>
       </div>
