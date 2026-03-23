@@ -4,7 +4,8 @@ import { ConfigurationPageContent } from "./components/ConfigurationPageContent"
 import ConfigurationLoading from "./loading";
 
 import { getQueryClient } from "lib/serverStore";
-import { Pipeline, Stage } from "lib/services/pipeline/types";
+import { fetchPipelines, fetchStagesFull } from "db/queries";
+import { Pipeline } from "lib/services/pipeline/types";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -50,33 +51,17 @@ export default async function ConfigurationPage({ params }: PageProps) {
   // 创建服务端 QueryClient
   const queryClient = getQueryClient();
 
-  // 并行预取数据 - 使用相对路径让 Next.js ISR 缓存生效
-  await Promise.all([
-    queryClient.fetchQuery({
-      queryKey: ["pipelines", id],
-      queryFn: async (): Promise<Pipeline> => {
-        const response = await fetch(`/api/pipelines/${id}`, {
-          next: { revalidate: 60 },
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to fetch pipeline: ${response.statusText}`);
-        }
-        return response.json();
-      },
-    }),
-    queryClient.fetchQuery({
-      queryKey: ["pipelines", id, "stages"],
-      queryFn: async (): Promise<Stage[]> => {
-        const response = await fetch(`/api/pipelines/${id}/stages`, {
-          next: { revalidate: 60 },
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to fetch stages: ${response.statusText}`);
-        }
-        return response.json();
-      },
-    }),
+  // 直接使用数据库查询，避免 HTTP 调用的开销和环境问题
+  const [pipelines, stages] = await Promise.all([
+    fetchPipelines(),
+    fetchStagesFull(id),
   ]);
+
+  const pipeline = pipelines.find((p) => p.id === id);
+
+  // 预填充 TanStack Query 缓存，供客户端使用
+  queryClient.setQueryData(["pipelines", id], pipeline);
+  queryClient.setQueryData(["pipelines", id, "stages"], stages);
 
   // 将预取的数据传递给客户端
   const dehydratedState = dehydrate(queryClient);
