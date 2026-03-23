@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { headers } from "next/headers";
 import { ConfigurationPageContent } from "./components/ConfigurationPageContent";
 import ConfigurationLoading from "./loading";
 
@@ -14,25 +13,50 @@ interface PageProps {
 // ISR：60秒后重新验证
 export const revalidate = 60;
 
+/**
+ * 生成静态参数
+ * 在构建时预渲染已知的 pipeline 页面
+ */
+export async function generateStaticParams() {
+  // 构建时使用环境变量或默认 localhost
+  const buildApiUrl = process.env.BUILD_API_URL || 'http://localhost:3000';
+
+  try {
+    const response = await fetch(`${buildApiUrl}/api/pipelines`, {
+      // 构建时的缓存策略
+      next: { revalidate: 3600 }, // 1小时
+    });
+
+    if (!response.ok) {
+      console.warn('Failed to fetch pipelines for generateStaticParams:', response.statusText);
+      return [];
+    }
+
+    const pipelines: Pipeline[] = await response.json();
+    return pipelines.map((pipeline) => ({
+      id: pipeline.id,
+    }));
+  } catch (error) {
+    console.warn('Error in generateStaticParams:', error);
+    // 如果构建时无法获取数据，返回空数组
+    // 这样新创建的 pipeline 会使用 SSR
+    return [];
+  }
+}
+
 export default async function ConfigurationPage({ params }: PageProps) {
   const { id } = await params;
 
   // 创建服务端 QueryClient
   const queryClient = getQueryClient();
 
-  // 获取当前请求的完整 URL（Next.js 15 中 headers() 返回 Promise）
-  const headersList = await headers();
-  const host = headersList.get('host') || 'localhost:3000';
-  const protocol = headersList.get('x-forwarded-proto') || 'http';
-  const serverUrl = `${protocol}://${host}`;
-
-  // 并行预取数据
+  // 并行预取数据 - 使用相对路径让 Next.js ISR 缓存生效
   await Promise.all([
     queryClient.fetchQuery({
       queryKey: ["pipelines", id],
       queryFn: async (): Promise<Pipeline> => {
-        const response = await fetch(`${serverUrl}/api/pipelines/${id}`, {
-          cache: 'no-store',
+        const response = await fetch(`/api/pipelines/${id}`, {
+          next: { revalidate: 60 },
         });
         if (!response.ok) {
           throw new Error(`Failed to fetch pipeline: ${response.statusText}`);
@@ -43,8 +67,8 @@ export default async function ConfigurationPage({ params }: PageProps) {
     queryClient.fetchQuery({
       queryKey: ["pipelines", id, "stages"],
       queryFn: async (): Promise<Stage[]> => {
-        const response = await fetch(`${serverUrl}/api/pipelines/${id}/stages`, {
-          cache: 'no-store',
+        const response = await fetch(`/api/pipelines/${id}/stages`, {
+          next: { revalidate: 60 },
         });
         if (!response.ok) {
           throw new Error(`Failed to fetch stages: ${response.statusText}`);
