@@ -92,7 +92,7 @@ ai-compoder/
 项目严格遵循**四层架构设计**：
 
 1. **页面层** (`/apps/web/app`) - 页面布局和组件组装
-2. **Server-Store 层** (`/apps/web/lib/server-store`) - 数据交互和缓存
+2. **Server-Store 层** (`/apps/web/lib/serverStore`) - 数据交互和缓存
 3. **API Service 层** (`/apps/web/lib/services`) - 纯粹的 API 调用
 4. **组件层** (`/apps/web/lib/components`) - UI 组件复用
 

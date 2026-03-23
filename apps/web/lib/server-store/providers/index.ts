@@ -3,3 +3,4 @@
  */
 
 export { QueryProvider as ServerStoreQueryProvider } from './QueryProvider'
+export { getQueryClient } from './queryClient'

@@ -32,9 +32,9 @@ pnpm lint
 - **关键文件**: `app/page.tsx`（带 hero、features 和聊天功能的落地页）、`app/layout.tsx`（根布局）、`app/api/generate/route.ts`（AI 生成 API 端点）
 - **交互规则**: 仅调用 Server-Store 层，绝不直接调用 API Service 层或后端 API
 
-### 2. Server-Store 层 (`/lib/server-store`)
+### 2. Server-Store 层 (`/lib/serverStore`)
 - **用途**: 使用 TanStack Query 的数据交互枢纽，负责缓存、加载/错误状态和重试机制
-- **关键文件**: `lib/server-store/providers/QueryProvider.tsx`（React Query 提供者）、`lib/server-store/index.ts`（主入口）
+- **关键文件**: `lib/serverStore/providers/QueryProvider.tsx`（React Query 提供者）、`lib/serverStore/index.ts`（主入口）
 - **技术栈**: `@tanstack/react-query`
 - **交互规则**: 仅调用 API Service 层，处理数据包装和缓存
 

@@ -21,7 +21,7 @@
 ### 3. 技术栈检查
 - 检查 `components/biz/` 中是否有可复用的业务组件
 - 检查 `components/ui/` 中是否有合适的基础组件
-- 检查 `lib/server-store/` 中是否需要新的数据获取 hooks
+- 检查 `lib/serverStore/` 中是否需要新的数据获取 hooks
 - 检查 `lib/services/` 中是否需要新的 API 服务函数
 
 ### 4. 标准文件结构生成
