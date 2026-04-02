@@ -15,17 +15,23 @@ interface PipelineGridClientProps {
  * Handles client-side interactions and real-time updates
  */
 export function PipelineGridClient({ initialPipelines }: PipelineGridClientProps) {
-  const { data: pipelines, isLoading, error } = useQuery<Pipeline[]>({
+  const {
+    data: pipelines,
+    isLoading,
+    error,
+  } = useQuery<Pipeline[]>({
     queryKey: ["pipelines"],
     queryFn: getPipelines,
+    // 这里先用初始值进行渲染，同时在挂载时刷新一遍数据，并且设置 5 分钟后数据过期
     initialData: initialPipelines,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnMount: "always",
   });
 
   if (isLoading && !pipelines) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3].map(i => (
           <div
             key={i}
             className="h-[340px] rounded-2xl border border-white/5 bg-white/5 p-8 animate-pulse"
