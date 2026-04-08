@@ -5,6 +5,7 @@ import { ServerStoreQueryProvider } from "lib/serverStore";
 import { Provider } from "jotai";
 import { Toaster } from "lib/ui/sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { CommandPalette } from "lib/components/biz/CommandPalette";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,7 +42,10 @@ export default function RootLayout({
 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ServerStoreQueryProvider>
-          <Provider>{children}</Provider>
+          <Provider>
+            {children}
+            <CommandPalette />
+          </Provider>
         </ServerStoreQueryProvider>
         <Toaster />
         <SpeedInsights />

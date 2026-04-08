@@ -9,3 +9,6 @@ export const pipelineStateAtomFamily = atomFamily((_pipelineId: PipelineId) =>
 export const pipelineStagesAtomFamily = atomFamily((_stageKey: string) =>
   atom<StageState>({ status: "idle" })
 );
+
+// Command Palette State
+export const commandPaletteOpenAtom = atom(false);

@@ -23,12 +23,35 @@
 
 ### 4. 标准文件结构生成
 
-根据以下标准格式创建业务组件文件：
+#### 4.1 目录组织原则
+
+业务组件采用分层目录结构，主组件与子组件分离：
+
+```
+ComponentName/
+├── ComponentName.tsx       # 主组件文件
+├── components/             # 子组件目录（当有可拆分的子组件时创建）
+│   ├── SubComponentA.tsx
+│   ├── SubComponentB.tsx
+│   └── ...
+├── types.ts                # TypeScript 类型定义
+├── utils.ts                # 工具函数
+├── variants.ts             # CVA 变体定义（可选）
+├── ComponentName.stories.tsx  # Storybook 故事文件
+└── index.ts                # 导出文件
+```
+
+**何时创建 `components/` 子目录：**
+- 组件有多个可复用的子部件
+- 子组件可以被主组件以外的其他组件使用
+- 子组件有独立的状态或复杂逻辑
+
+#### 4.2 文件说明
 
 ```ts
 // [ComponentName].tsx
 // 主组件文件，包含组件实现逻辑
-// 如果组件过大，或者是有可以拆出来的组件，统一放到和该主组件同一层级的 ./components/下
+// 如果有子组件，统一放到和该主组件同一层级的 ./components/下
 // 该组件内不能定义其他函数或类型，如果需要自定义工具函数或类型，一律从 ./utils.ts、./types.ts 和 ./variants.ts 下定义并引入
 // 禁止使用 useMemo 和 useCallback 这类 React 的缓存 hook
 // 组件内如果要使用 react 包下的某个函数或 hook，一律从上方导入后，再使用，禁止出现类似这样的写法：React.xxx
@@ -36,8 +59,23 @@
 ```
 
 ```ts
+// components/[SubComponent].tsx
+// 子组件文件，包含子组件的实现逻辑
+// 子组件从 ../types.ts 导入类型，从 ../utils.ts 导入工具函数
+// 禁止定义独立函数或类型，统一使用父目录的类型和工具文件
+```
+
+```ts
+// types.ts
+// TypeScript 类型定义文件
+// 包含主组件和所有子组件的 Props 类型定义
+// 严格区分某个 prop 是必填还是选填
+```
+
+```ts
 // utils.ts
 // 工具函数，组件相关的辅助函数
+// 供主组件和所有子组件共享使用
 ```
 
 ```ts
@@ -50,19 +88,14 @@
 ```ts
 // [ComponentName].stories.tsx
 // Storybook 故事文件，用于组件展示和测试
+// 包含主组件和子组件的示例
 ```
 
 ```ts
 // index.ts
 // 导出文件，统一导出组件和相关类型
-// 导出 [ComponentName].tsx 和 types.ts 文件中组件参数的 Props 类型
+// 导出主组件、子组件和所有 Props 类型
 // 禁止导出 utils.ts 的工具，如果该工具有复用性，应该封装到全局，即 lib/utils.ts 里
-```
-
-```ts
-// types.ts
-// TypeScript 类型定义文件
-// 严格区分某个 prop 是必填还是选填
 ```
 
 ### 5. 组件规范要求
