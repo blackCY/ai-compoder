@@ -24,6 +24,8 @@
       "lib/ui/*": ["./lib/components/ui/*"],
       "lib/bizComp": ["./lib/components/biz"],
       "lib/bizComp/*": ["./lib/components/biz/*"],
+      "lib/components/biz": ["./lib/components/biz"],
+      "lib/components/biz/*": ["./lib/components/biz/*"],
       "lib/hooks": ["./lib/hooks"],
       "lib/hooks/*": ["./lib/hooks/*"],
       "lib/request": ["./lib/request"],
