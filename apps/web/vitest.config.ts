@@ -68,6 +68,28 @@ export default defineConfig({
           name: 'unit',
           environment: 'node',
           include: ['**/*.test.ts', '**/*.test.tsx', '**/__tests__/**/*.test.{ts,tsx}'],
+          exclude: [
+            '**/*.stories.*',
+            'node_modules/**/*',
+            'lib/server-store/**/*.test.ts',
+            'lib/components/**/*.test.tsx',
+          ],
+        },
+      },
+      {
+        test: {
+          name: 'react-hooks',
+          environment: 'happy-dom',
+          include: ['lib/server-store/**/*.test.ts'],
+          exclude: ['**/*.stories.*', 'node_modules/**/*'],
+        },
+      },
+      {
+        test: {
+          name: 'react-components',
+          environment: 'happy-dom',
+          setupFiles: ['./lib/components/test-setup.ts'],
+          include: ['lib/components/**/*.test.tsx', 'lib/components/**/*.test.ts'],
           exclude: ['**/*.stories.*', 'node_modules/**/*'],
         },
       },
