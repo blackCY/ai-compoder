@@ -1,6 +1,28 @@
 import type { FileState } from './types';
 
 /**
+ * Generate a unique file ID for tracking uploads
+ * @param file - The File object to generate ID for
+ * @returns Unique ID string
+ */
+export function generateFileId(file: File): string {
+  return `${file.name}-${file.size}-${Date.now()}`;
+}
+
+/**
+ * Generate a preview URL for image files
+ * @param file - The File object to generate preview for
+ * @returns Preview URL or undefined for non-images
+ */
+export function getFilePreview(file: File): string | undefined {
+  // Check if file is an image
+  if (!file.type.startsWith('image/')) {
+    return undefined;
+  }
+  return URL.createObjectURL(file);
+}
+
+/**
  * Generate a base64 preview for image files
  * @param file - The File object to generate preview for
  * @returns Promise resolving to base64 data URL or undefined for non-images
